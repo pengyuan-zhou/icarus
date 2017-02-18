@@ -1,0 +1,188 @@
+"""This module contains all configuration information used to run simulations
+    """
+from multiprocessing import cpu_count
+from collections import deque
+import copy
+from icarus.util import Tree
+
+# GENERAL SETTINGS
+
+# Level of logging output
+# Available options: DEBUG, INFO, WARNING, ERROR, CRITICAL
+LOG_LEVEL = 'INFO'
+
+# If True, executes simulations in parallel using multiple processes
+# to take advantage of multicore CPUs
+PARALLEL_EXECUTION = True
+
+# Number of processes used to run simulations in parallel.
+# This option is ignored if PARALLEL_EXECUTION = False
+N_PROCESSES = cpu_count()/2
+
+# Granularity of caching.
+# Currently, only OBJECT is supported
+CACHING_GRANULARITY = 'OBJECT'
+
+# Format in which results are saved.
+# Result readers and writers are located in module ./icarus/results/readwrite.py
+# Currently only PICKLE is supported
+RESULTS_FORMAT = 'PICKLE'
+
+# Number of times each experiment is replicated
+# This is necessary for extracting confidence interval of selected metrics
+N_REPLICATIONS = 1
+
+# List of metrics to be measured in the experiments
+# The implementation of data collectors are located in ./icaurs/execution/collectors.py
+DATA_COLLECTORS = ['CACHE_HIT_RATIO', 'LATENCY']#, 'PATH_STRETCH']#'LINK_LOAD', ]
+
+# Range of alpha values of the Zipf distribution using to generate content requests
+# alpha values must be positive. The greater the value the more skewed is the
+# content popularity distribution
+# Range of alpha values of the Zipf distribution using to generate content requests
+# alpha values must be positive. The greater the value the more skewed is the
+# content popularity distribution
+# Note: to generate these alpha values, numpy.arange could also be used, but it
+# is not recommended because generated numbers may be not those desired.
+# E.g. arange may return 0.799999999999 instead of 0.8.
+# This would give problems while trying to plot the results because if for
+# example I wanted to filter experiment with alpha=0.8, experiments with
+# alpha = 0.799999999999 would not be recognized
+ALPHA = [0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6]
+
+# Total size of network cache as a fraction of content population
+NETWORK_CACHE = [0.001, 0.002, 0.005]#0.01]#, 0.05]
+
+DIFF = [0.01, 0.05, 0.1]
+
+
+#group of user
+#WIDE 
+g_WIDE = {0: [4], 1: [28], 2: [3], 6: [5, 27, 7]}
+g_GARR = {4: [7, 1], 46: [60], 14: [26, 57], 15: [53], 49: [48, 50, 32, 42, 47], 18: [43, 41], 20: [12], 21: [19], 22: [8], 55: [11, 28], 58: [9], 29: [30], 31: [33]}
+g_GARR_2 = {34: [1012, 1014, 1011, 33, 1005], 35: [1013], 4: [7, 1, 1000], 37: [1016, 1025, 9, 1017, 1015, 1014], 40: [1018], 10: [1020, 1002, 1019, 1001], 14: [1003, 1021, 26, 57, 60], 15: [1004, 53], 49: [48, 1022, 50, 42, 47, 32], 18: [1006, 41, 43], 21: [1008, 19, 1007, 1009, 8, 12], 55: [11, 28, 1019, 1023, 1001], 56: [1024, 1005, 1016], 59: [1026, 1017], 29: [30, 1010]}
+g_GEANT = {3: [10, 19], 36: [37], 9: [18], 12: [20], 13: [11], 22: [26], 27: [21]}
+g_TISCALI = {198: [262, 452, 509, 567, 534, 394], 214: [534, 567, 452, 394, 509], 226: [459, 443, 444, 440, 567, 426, 452, 451, 534, 394, 509], 228: [567, 452, 509, 534], 229: [451, 452, 459, 460, 426, 567, 509, 534, 394], 390: [528, 525, 527, 567, 394, 509, 534, 452], 327: [394, 338, 553, 361, 543, 551, 513, 548, 534, 509, 567, 452], 201: [262, 534, 394, 567, 452], 203: [204, 262, 452, 394, 509, 567, 534], 207: [567, 204, 248, 534, 394, 509, 452], 208: [248, 394, 567, 534, 509], 209: [567, 509, 394, 534, 452], 340: [516, 534, 452, 567, 394, 509], 438: [442, 453, 446, 509, 534, 567, 394, 452], 439: [446, 453, 442, 458, 441, 452, 567, 534, 394, 509], 153: [548, 513, 394, 543, 361, 551, 367, 547, 522, 509, 364, 553, 523, 452, 567, 534], 217: [248, 394, 452, 509, 534, 567], 197: [262, 394, 567, 509, 452, 534]}
+
+GROUP_OF_USERS = [g_WIDE]#, g_GARR, g_GEANT, g_TISCALI]
+
+# Number of content objects
+N_CONTENTS = 3*10**5
+
+# Number of requests per second (over the whole network)
+NETWORK_REQUEST_RATE = 12.0
+
+# Number of content requests generated to prepopulate the caches
+# These requests are not logged
+N_WARMUP_REQUESTS = 3*10**5
+
+# Number of content requests generated after the warmup and logged
+# to generate results.
+N_MEASURED_REQUESTS = 6*10**5
+
+# List of all implemented topologies
+# Topology implementations are located in ./icarus/scenarios/topology.py
+TOPOLOGIES =  [
+#               'ROCKET_FUEL'
+#               'GEANT'#,
+               'WIDE'
+#               'GARR_2'
+#               'GARR',
+#               'TISCALI'
+               ]
+
+#ASNS = [
+        #1221#,
+        #1239,
+        #1755,
+        #3257,
+        #3967,
+        #6461
+        #]
+
+
+# List of caching and routing strategies
+# The code is located in ./icarus/models/strategy.py
+STRATEGIES = [
+              'EDGE',
+              #'HR_SYMM',         # Symmetric hash-routing
+              'HR_ASYMM',        # Asymmetric hash-routing
+              'HR_MULTICAST',    # Multicast hash-routing
+              #'HR_HYBRID_AM',    # Hybrid Asymm-Multicast hash-routing
+              'HR_HYBRID_SM',    # Hybrid Symm-Multicast hash-routing
+              'CL4M',            # Cache less for more
+              'PROB_CACHE',      # ProbCache
+              'LCD',             # Leave Copy Down
+              #'RAND_CHOICE',     # Random choice: cache in one random cache on path
+              'RAND_BERNOULLI'  # Random Bernoulli: cache randomly in caches on path
+              ]
+
+WORKLOADS = [
+             'ALLDIFF',
+             'GLOBALZIPF',
+             'LOCALZIPF',
+             'GROUPALLDIFF',
+             'GROUPZIPF'
+            ]
+
+# Cache replacement policy used by the network caches.
+# Supported policies are: 'LRU', 'LFU', 'FIFO', 'RAND' and 'NULL'
+# Cache policy implmentations are located in ./icarus/models/cache.py
+CACHE_POLICY = 'LRU'
+
+
+
+# Queue of experiments
+EXPERIMENT_QUEUE = deque()
+default = Tree()
+
+#default['topology']['name'] = 'ROCKET_FUEL'
+#default['topology']['asn'] = 1755
+
+default['test_strategy'] = {
+                            'name': 'EDGE'
+                            }
+
+"""default['test_workload'] = {
+                        'name':      'TEST',
+                        'n_contents': N_CONTENTS,
+                        'n_warmup':   N_WARMUP_REQUESTS,
+                        'n_measured': N_MEASURED_REQUESTS,
+                        'rate':       NETWORK_REQUEST_RATE,
+                        'alpha':      0.8
+                        }"""
+
+default['workload'] = {
+#                        'name':      'GROUP',
+                        'n_contents': N_CONTENTS,
+                        'group_of_user': GROUP_OF_USERS,
+                        'n_warmup':   N_WARMUP_REQUESTS,
+                        'n_measured': N_MEASURED_REQUESTS,
+                        'rate':       NETWORK_REQUEST_RATE
+                        }
+default['cache_placement']['name'] = 'UNIFORM'
+#decide the size of cache in each icr_candidate
+default['content_placement']['name'] = 'UNIFORM'
+#decide the content in each source
+default['cache_policy']['name'] = CACHE_POLICY
+
+# Create experiments multiplexing all desired parameters
+
+for topology in TOPOLOGIES:
+    #for asn in ASNS:
+    for strategy in STRATEGIES:
+        for workload in WORKLOADS:
+            for diff in DIFF:
+                for network_cache in NETWORK_CACHE:
+                    for alpha in ALPHA:
+                        experiment = copy.deepcopy(default)
+                        experiment['topology']['name'] = topology
+                        experiment['workload']['name'] = workload
+                        experiment['workload']['diff'] = diff
+                        experiment['workload']['alpha'] = alpha
+                        experiment['strategy']['name'] = strategy
+                        #experiment['topology']['asn'] = asn
+                        experiment['cache_placement']['network_cache'] = network_cache
+                        experiment['desc'] = "topology: %s, strategy: %s, diff: %s, Alpha: %s, workload: %s,  network cache: %s" \
+                            % (topology, strategy, str(diff), str(alpha), workload, str(network_cache))
+                        EXPERIMENT_QUEUE.append(experiment)
