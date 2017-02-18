@@ -13,7 +13,7 @@ import sys
 import signal
 import traceback
 
-from icarus.execution import exec_experiment, test_experiment
+from icarus.execution import exec_experiment
 from icarus.registry import TOPOLOGY_FACTORY, CACHE_PLACEMENT, CONTENT_PLACEMENT, \
                             CACHE_POLICY, WORKLOAD, DATA_COLLECTOR, STRATEGY
 from icarus.results import ResultSet
@@ -197,28 +197,15 @@ def run_scenario(settings, params, curr_exp, n_exp):
                          % topology_name)
             return None
         topology = TOPOLOGY_FACTORY[topology_name](**topology_spec)
-
         
-        """#test_workload
-        test_workload_spec = tree['test_workload']
-        test_workload_name = test_workload_spec.pop('name')
-        if test_workload_name not in WORKLOAD:
-            logger.error('No workload implementation named %s was found.'
-                         % test_workload_name)
-            return None
-        test_workload = WORKLOAD[test_workload_name](topology, **test_workload_spec)"""
-
-
         workload_spec = tree['workload']
         workload_name = workload_spec.pop('name')
         if workload_name not in WORKLOAD:
             logger.error('No workload implementation named %s was found.'
                          % workload_name)
             return None
-        #print workload_spec
-        #workload_spec['group_of_user'] = group_of_user
-        workload = WORKLOAD[workload_name](topology, **workload_spec)
-
+        workload = WORKLOAD[workload_name](topology, curr_exp, **workload_spec)
+        
         # Assign caches to nodes
         if 'cache_placement' in tree:
             cachepl_spec = tree['cache_placement']
@@ -232,6 +219,7 @@ def run_scenario(settings, params, curr_exp, n_exp):
             # the whole network
             cachepl_spec['cache_budget'] = workload.n_contents * network_cache
             CACHE_PLACEMENT[cachepl_name](topology, **cachepl_spec)
+            #print cachepl_spec['cache_budget']
 
         # Assign contents to sources
         # If there are many contents, after doing this, performing operations
@@ -250,13 +238,7 @@ def run_scenario(settings, params, curr_exp, n_exp):
         if strategy['name'] not in STRATEGY:
             logger.error('No implementation of strategy %s was found.' % strategy['name'])
             return None
-
-        """test_strategy = tree['test_strategy']
-        if test_strategy['name'] not in STRATEGY:
-            logger.error('No implementation of strategy %s was found.' % test_strategy['name'])
-            return None"""
-
-
+        
         # cache eviction policy definition
         cache_policy = tree['cache_policy']
         if cache_policy['name'] not in CACHE_POLICY:
@@ -277,60 +259,7 @@ def run_scenario(settings, params, curr_exp, n_exp):
     
         collectors = {m: {} for m in metrics}
 
-        logger.info('Experiment_test %d/%d | Start simulation', curr_exp, n_exp)
-        
-        #test the topology and initial the workload according to it
-        #get the tree of edge cache to receivers
-        """group_of_user = dict()
-        group_of_user = test_experiment(topology, test_workload, netconf, test_strategy, cache_policy, collectors)
-        print "group_of_user", group_of_user"""
-        #workload
-        #add the distribution of users to workload
-        """workload_spec = tree['workload']
-        workload_name = workload_spec.pop('name')
-        if workload_name not in WORKLOAD:
-            logger.error('No workload implementation named %s was found.'
-                         % workload_name)
-            return None
-        #print workload_spec
-        workload_spec['group_of_user'] = group_of_user
-        workload = WORKLOAD[workload_name](topology, **workload_spec)"""
-        #########################################################################
-        #########################################################################
-        #########################################################################
-        #########################################################################
-        # Assign caches to nodes
-
-        # Cache budget is the cumulative number of cache entries across
-        # the whole network
-        #print "workload.n_contents", workload.n_contents
-        #print "cachepl_spec", cachepl_spec
-        #print "cachepl_name", cachepl_name
-        """cachepl_spec['cache_budget'] = workload.n_contents * network_cache
-        CACHE_PLACEMENT[cachepl_name](topology, **cachepl_spec)
-        
-        # Assign contents to sources
-        # If there are many contents, after doing this, performing operations
-        # requiring a topology deep copy, i.e. to_directed/undirected, will
-        # take long.
-
-        CONTENT_PLACEMENT[contpl_name](topology, workload.contents, **contpl_spec)
-    
-        # Configuration parameters of network model
-        netconf = tree['netconf']
-        
-        # Text description of the scenario run to print on screen
-        scenario = tree['desc'] if 'desc' in tree else "Description N/A"
-        
-        logger.info('Experiment %d/%d | Preparing scenario: %s', curr_exp, n_exp, scenario)
-        
-        if any(m not in DATA_COLLECTOR for m in metrics):
-            logger.error('There are no implementations for at least one data collector specified')
-            return None
-
-        collectors = {m: {} for m in metrics}"""
-
-
+        logger.info('Experiment %d/%d | Start simulation', curr_exp, n_exp)
         results = exec_experiment(topology, workload, netconf, strategy, cache_policy, collectors)
         
         duration = time.time() - start_time
