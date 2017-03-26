@@ -197,7 +197,6 @@ def run_scenario(settings, params, curr_exp, n_exp):
                          % topology_name)
             return None
         topology = TOPOLOGY_FACTORY[topology_name](**topology_spec)
-
         workload_spec = tree['workload']
         workload_name = workload_spec.pop('name')
         if workload_name not in WORKLOAD:
@@ -217,7 +216,8 @@ def run_scenario(settings, params, curr_exp, n_exp):
             network_cache = cachepl_spec.pop('network_cache')
             # Cache budget is the cumulative number of cache entries across
             # the whole network
-            cachepl_spec['cache_budget'] = workload.n_contents * network_cache
+            #change due to different rank
+            cachepl_spec['cache_budget'] = workload.contents_range * network_cache
             CACHE_PLACEMENT[cachepl_name](topology, **cachepl_spec)
 
         # Assign contents to sources
@@ -257,7 +257,8 @@ def run_scenario(settings, params, curr_exp, n_exp):
             return None
 
         collectors = {m: {} for m in metrics}
-
+        
+        #!!!!!!!!!!the key execution!!!!!!!!!!!!!!!!!#
         logger.info('Experiment %d/%d | Start simulation', curr_exp, n_exp)
         results = exec_experiment(topology, workload, netconf, strategy, cache_policy, collectors)
 

@@ -26,7 +26,7 @@ class NearestReplicaRouting(Strategy):
     metacaching policies. LCE and LCD are currently supported.
     """
 
-    def __init__(self, view, controller, metacaching, implementation='ideal',
+    def __init__(self, view, controller, metacaching= 'LCE', implementation='ideal',
                  radius=4, **kwargs):
         """Constructor
 
@@ -51,7 +51,7 @@ class NearestReplicaRouting(Strategy):
             raise ValueError("Metacaching policy %s not supported" % metacaching)
         if implementation not in ('ideal', 'approx_1', 'approx_2'):
             raise ValueError("Implementation %s not supported" % implementation)
-        self.metacaching = metacaching
+        self.metacaching = 'LCD'
         self.implementation = implementation
         self.radius = radius
         self.distance = nx.all_pairs_dijkstra_path_length(self.view.topology(),
@@ -61,6 +61,7 @@ class NearestReplicaRouting(Strategy):
     def process_event(self, time, receiver, content, log):
         # get all required data
         locations = self.view.content_locations(content)
+        #print (receiver, content, locations)
         nearest_replica = min(locations, key=lambda x: self.distance[receiver][x])
         # Route request to nearest replica
         self.controller.start_session(time, receiver, content, log)
@@ -92,9 +93,10 @@ class NearestReplicaRouting(Strategy):
             copied = False
             for u, v in path_links(path):
                 self.controller.forward_content_hop(u, v)
-                if not copied and v != receiver and self.view.has_cache(v):
+                if not copied and v == receiver and self.view.has_cache(v):
                     self.controller.put_content(v)
                     copied = True
+                    #print ("pushed content to node :%d when receiver is :%d") % (v,receiver)
         else:
             raise ValueError('Metacaching policy %s not supported'
                              % self.metacaching)

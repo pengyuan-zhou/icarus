@@ -93,8 +93,10 @@ class NetworkView(object):
         """
         loc = set(v for v in self.model.cache if self.model.cache[v].has(k))
         source = self.content_source(k)
-        if source:
-            loc.add(source)
+        #since in this simulation, we only have one source which is number 0,
+        # to simplify the configure, skip the checking
+        #if source:
+        loc.add(source)
         return loc
 
     def content_source(self, k):
@@ -373,7 +375,8 @@ class NetworkModel(object):
         cache_size = {}
         for node in topology.nodes_iter():
             stack_name, stack_props = fnss.get_stack(topology, node)
-            if stack_name == 'router':
+            #difference between our situation with normal configuration
+            if stack_name == 'receiver':
                 if 'cache_size' in stack_props:
                     cache_size[node] = stack_props['cache_size']
             elif stack_name == 'source':
@@ -391,6 +394,7 @@ class NetworkModel(object):
         policy_name = cache_policy['name']
         policy_args = {k: v for k, v in cache_policy.items() if k != 'name'}
         # The actual cache objects storing the content
+        #key point!!!!!!!!!!!!!!!!!!!!!!!!!
         self.cache = {node: CACHE_POLICY[policy_name](cache_size[node], **policy_args)
                           for node in cache_size}
 

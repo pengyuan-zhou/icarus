@@ -39,8 +39,6 @@ def uniform_cache_placement(topology, cache_budget, **kwargs):
     cache_size = iround(cache_budget / len(icr_candidates))
     for v in icr_candidates:
         topology.node[v]['stack'][1]['cache_size'] = cache_size
-
-
 @register_cache_placement('DEGREE')
 def degree_centrality_cache_placement(topology, cache_budget, **kwargs):
     """Places cache budget proportionally to the degree of the node.

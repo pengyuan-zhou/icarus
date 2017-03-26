@@ -57,5 +57,7 @@ def exec_experiment(topology, workload, netconf, strategy, cache_policy, collect
     strategy_inst = STRATEGY[strategy_name](view, controller, **strategy_args)
 
     for time, event in workload:
+        #print ("following event is goint to strategy.process_event")
+        #print (event)
         strategy_inst.process_event(time, **event)
     return collector.results()
