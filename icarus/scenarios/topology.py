@@ -14,10 +14,11 @@ A valid ICN topology must have the following attributes:
 from __future__ import division
 
 from os import path
-
+from random import random
+from bisect import bisect
 import networkx as nx
 import fnss
-
+import math
 from icarus.registry import register_topology_factory
 
 
@@ -146,20 +147,27 @@ def topology_datacenter(n_datastore, n_node, n_member,in_delay=2, out_delay=34, 
     fnss.set_weights_constant(topology, 1.0)
         
     # assign delay
-    fnss.set_delays_constant(topology, in_delay, 'ms')
+    # when group size increases, the proportion of member-to-leader link with a large dealy also 
+    #increases, with a higher possibilty even larger than delay of leader-to-store link.
+    #in that case, node will fetch data from store directly to decrease delay
+    ps_largedelay = 0.5/math.sqrt(n_leader)
+    ps_indelay = 1 - ps_largedelay
+    large_delay = 36
     
     # label links as internal or external
 
     #without grouping, exchange internal and external setting
-    #this balance the path delay from member to datastore, while 
-    #forcing member request to datastore instead of other members
-    #leader in this case is just a conceptual layer instead of actual node
+    #this balance the path delay from member to datastore with other situlations,
+    #while forcing member request to datastore instead of other members
+    #leader in this case can be seen as just a conceptual layer instead of actual node
     if n_leader == 1 :
+        fnss.set_delays_constant(topology, 0, 'ms') 
         for u, v in topology.edges():
             if u in members or v in members:
                 topology.edge[u][v]['type'] = 'external'
                 fnss.set_weights_constant(topology, 1000.0, [(u, v)])
-                fnss.set_delays_constant(topology, out_delay, 'ms', [(u, v)])
+                intra_delay = weighted_choice([(large_delay,ps_largedelay),(in_delay,ps_indelay)])
+                fnss.set_delays_constant(topology, (intra_delay+out_delay), 'ms', [(u, v)])
             else:
                 topology.edge[u][v]['type'] = 'internal'
     
@@ -172,6 +180,18 @@ def topology_datacenter(n_datastore, n_node, n_member,in_delay=2, out_delay=34, 
                 fnss.set_delays_constant(topology, out_delay, 'ms', [(u, v)])
                 #print (u , v , topology.edge[u][v])
             else:
+                intra_delay = weighted_choice([(large_delay,ps_largedelay),(in_delay,ps_indelay)])
+                fnss.set_delays_constant(topology, intra_delay, 'ms', [(u, v)])
                 topology.edge[u][v]['type'] = 'internal'
     return IcnTopology(topology)  
-    
+   
+def weighted_choice(choices):
+    values, weights = zip(*choices)
+    total = 0
+    cum_weights = []
+    for w in weights:
+        total += w
+        cum_weights.append(total)
+    x = random() * total
+    i = bisect(cum_weights, x)
+    return values[i]

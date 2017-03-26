@@ -112,7 +112,7 @@ def plot_cache_hits_vs_group_size(resultset, topology, cache_size, group_size_ra
     desc['ycondnames'] = [('strategy', 'name')]*len(strategies)
     desc['ycondvals'] = strategies
     desc['errorbar'] = True
-    desc['legend_loc'] = 'upper left'
+    desc['legend_loc'] = 'upper right'
     desc['line_style'] = STRATEGY_STYLE
     desc['legend'] = STRATEGY_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
@@ -134,7 +134,7 @@ def plot_latency_vs_group_size(resultset, topology, cache_size, group_size_range
     desc['ycondnames'] = [('strategy', 'name')]*len(strategies)
     desc['ycondvals'] = strategies
     desc['errorbar'] = True
-    desc['legend_loc'] = 'upper right'
+    desc['legend_loc'] = 'upper left'
     desc['line_style'] = STRATEGY_STYLE
     desc['legend'] = STRATEGY_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS

@@ -23,14 +23,19 @@ N_RANK: number of overall workloads rank(one rank indicates one workload)
 simulation:
 for each group size, the nodes are equally divided to groups of the size. 
 The workloads are also equally distributed to groups.
-Generating one group leader for each group, which has far smaller latency to member than to datastore.
+Generating one group leader for each group.
+member-leader link normally has smaller delay than leader-datastore link.
+When group size increases, higher proportion of member-leader links have larger delay than leader-datastore link.
+Because larger group size means more distributed nodes. And then more nodes are fetching data directly from datastore. 
+
+When "group size" equals to number of nodes, there is only one group, meaning there are no groups.
+All workloads are distributed to nodes randomly. All nodes fetch data from data store.
+
+
 Member can only get to datastore via leader.
 Leader can only get to another leader via datastore.
 
  
-When "group size" equals to number of nodes, there is only one group, meaning there are no groups.
-All workloads are distributed to nodes randomly. All nodes are forced to fetch data from data store(according to paper assumption)..
-
 
 
 ##requirement to simplify config
