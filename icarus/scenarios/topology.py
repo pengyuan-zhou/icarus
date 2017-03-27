@@ -24,7 +24,7 @@ from icarus.registry import register_topology_factory
 
 __all__ = [
         'IcnTopology',
-        'topology_datacenter'
+        'topology_edgefog'
            ]
 
 
@@ -81,8 +81,8 @@ class IcnTopology(fnss.Topology):
                    and self.node[v]['stack'][0] == 'receiver')
 
 
-@register_topology_factory('DATACENTER')
-def topology_datacenter(n_datastore, n_node, n_member,in_delay=2, out_delay=34, **kwargs):
+@register_topology_factory('EDGEFOG')
+def topology_edgefog(n_datastore, n_node, n_member,in_delay=2, out_delay=34, **kwargs):
     """Returns a 3 layer topology, with a source at core, n_members of
     receivers(with cache capacity) per leader.
 
@@ -153,24 +153,42 @@ def topology_datacenter(n_datastore, n_node, n_member,in_delay=2, out_delay=34, 
     ps_largedelay = 0.5/math.sqrt(n_leader)
     ps_indelay = 1 - ps_largedelay
     large_delay = 36
-    
+    # mean value of delay in grouping situations, computed by mean(sum(((large_delay*ps_largedelay)+(in_delay*ps_indelay))for all n_leader))
+    mean_delay = 9.3    
     # label links as internal or external
 
-    #without grouping, exchange internal and external setting
+    #without grouping, leader-store delay =0,leader in this case can be ignored
+    #member-store delay is set as mean value of other situations.
     #this balance the path delay from member to datastore with other situlations,
     #while forcing member request to datastore instead of other members
-    #leader in this case can be seen as just a conceptual layer instead of actual node
-    if n_leader == 1 :
+    if n_member == n_node :
         fnss.set_delays_constant(topology, 0, 'ms') 
         for u, v in topology.edges():
             if u in members or v in members:
                 topology.edge[u][v]['type'] = 'external'
                 fnss.set_weights_constant(topology, 1000.0, [(u, v)])
-                intra_delay = weighted_choice([(large_delay,ps_largedelay),(in_delay,ps_indelay)])
-                fnss.set_delays_constant(topology, (intra_delay+out_delay), 'ms', [(u, v)])
+                #use the same way with choosing by possibilty, resulting with largest mean delay in all situations
+                #intra_delay = weighted_choice([(large_delay,ps_largedelay),(in_delay,ps_indelay)])
+                #Or use mean value of delay in other situations, which provides consistance
+                fnss.set_delays_constant(topology, (mean_delay+out_delay), 'ms', [(u, v)])
             else:
                 topology.edge[u][v]['type'] = 'internal'
-    
+    #also same with no grouping since each individual node is a group.
+    #member-leader delay =0 since each leader only connect to one node, they can be infinite nearby
+    #member-store delay is set as mean value of other situations.
+    elif n_member == 1 :
+        fnss.set_delays_constant(topology, 0, 'ms') 
+        for u, v in topology.edges():
+            if u in datastores or v in datastores:
+                topology.edge[u][v]['type'] = 'external'
+                fnss.set_weights_constant(topology, 1000.0, [(u, v)])
+                #use the same way with choosing by possibilty, resulting with largest mean delay in all situations
+                #intra_delay = weighted_choice([(large_delay,ps_largedelay),(in_delay,ps_indelay)])
+                #Or use mean value of delay in other situations, which provides consistance
+                fnss.set_delays_constant(topology, (mean_delay+out_delay), 'ms', [(u, v)])
+            else:
+                topology.edge[u][v]['type'] = 'internal'
+
     else :
         for u, v in topology.edges():
             if u in datastores or v in datastores:
