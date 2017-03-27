@@ -21,6 +21,11 @@ not done yet
 #files location
 configure files in ./simulation/set1/
 
+
+#result location
+./simulation/set1/plots..../
+
+
 #Run Simulation:
 sh ./simulation/set1/run.sh
 
