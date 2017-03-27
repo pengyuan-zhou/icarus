@@ -30,7 +30,7 @@ RESULTS_FORMAT = 'PICKLE'
 
 # Number of times each experiment is replicated
 # This is necessary for extracting confidence interval of selected metrics
-N_REPLICATIONS = 5
+N_REPLICATIONS = 2
 
 # List of metrics to be measured in the experiments
 # The implementation of data collectors are located in ./icaurs/execution/collectors.py
@@ -81,8 +81,8 @@ N_RANK = 32
 
 N_CORE = 1
 N_NODE = 320
-#group_num = N_NODE/N_SIZES :32,16,8,4,2,1
-N_SIZES = [10, 20, 40, 80, 160, 320]
+#group_num = N_NODE/N_SIZES :320, 160, 64, 32,16,8,4,2,1
+N_SIZES = [1, 2, 5, 10, 20, 40, 80, 160, 320]
 
 TOPOLOGIES = [
                 'DATACENTER'
@@ -123,7 +123,7 @@ for alpha in ALPHA:
                     experiment = copy.deepcopy(default)
                     experiment['workload']['alpha'] = alpha
                     #overall number of workloads remain same, workloads intra group changes according to size
-                    experiment['workload']['rank_per_group'] = int(N_RANK/(N_NODE/n_size))
+                    experiment['workload']['rank_per_group'] = float(N_RANK/(N_NODE/n_size))
                     experiment['strategy']['name'] = strategy
                     experiment['topology']['name'] = topology
                     experiment['topology']['n_node'] = N_NODE

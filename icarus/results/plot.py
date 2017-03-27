@@ -194,6 +194,7 @@ def plot_lines(resultset, desc, filename, plotdir):
                     if v.getval(ymetrics[i]) is not None]
             confidence = desc['confidence'] if 'confidence' in desc else 0.95
             means[j], err[j] = means_confidence_interval(data, confidence)
+            print ("%d,%f") % (xvals[j],means[j])
         yerr = None if 'errorbar' in desc and not desc['errorbar'] or all(err == 0) else err
         fmt = desc['line_style'][yvals[i]] if 'line_style' in desc \
               and yvals[i] in desc['line_style'] else '-'

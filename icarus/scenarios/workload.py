@@ -20,6 +20,7 @@ all content identifiers. This is needed for content placement.
 import random
 import csv
 import array
+import math
 import networkx as nx
 
 from icarus.tools import TruncatedZipfDist
@@ -43,11 +44,14 @@ class DiffrankWorkload(object):
                 if topology.node[v]['stack'][0] == 'receiver']
         self.topology = topology
         rank_lst = array.array('i',(i for i in range(1,(n_rank+1))))
+        
+        
         #differentiate requests distribution inter groups, each group has $rank_per_group distributions.
+        # when num_of_group>N_NODE, multiple groups share a same workload  
         for v in self.receivers:
             g = self.topology.node[v]['group']
             self.topology.node[v]['rank'] = random.choice(array.array('i',(i for i in 
-                range((rank_per_group*g-rank_per_group+1),(rank_per_group*g+1))))) 
+                range(int(rank_per_group*g-rank_per_group+1),int(math.ceil(rank_per_group*g+1)))))) 
         self.n_contents = n_contents
         self.contents_range = int(n_contents * n_rank)
         self.contents = range(1, self.contents_range + 1)
