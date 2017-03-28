@@ -44,48 +44,27 @@ PLOT_EMPTY_GRAPHS = True
 # Off-path strategies: solid lines
 # On-path strategies: dashed lines
 # No-cache: dotted line
-STRATEGY_STYLE = {
-         'HR_SYMM':         'b-o',
-         'HR_ASYMM':        'g-D',
-         'HR_MULTICAST':    'm-^',         
-         'HR_HYBRID_AM':    'c-s',
-         'HR_HYBRID_SM':    'r-v',
-         'LCE':             'b--p',
-         'LCD':             'g-->',
-         'CL4M':            'g-->',
-         'PROB_CACHE':      'c--<',
-         'RAND_CHOICE':     'r--<',
-         'RAND_BERNOULLI':  'g--*',
-         'NO_CACHE':        'k:o',
-         'OPTIMAL':         'k-o',
-         'NRR':             'b-D'
+RANK_STYLE = {
+         4:     'b-o',
+         8:     'g-D',
+         16:    'm-^',         
+         32:    'c-s'
                 }
 
 # This dict maps name of strategies to names to be displayed in the legend
-STRATEGY_LEGEND = {
-         'LCE':             'LCE',
-         'LCD':             'LCD',
-         'HR_SYMM':         'HR Symm',
-         'HR_ASYMM':        'HR Asymm',
-         'HR_MULTICAST':    'HR Multicast',         
-         'HR_HYBRID_AM':    'HR Hybrid AM',
-         'HR_HYBRID_SM':    'HR Hybrid SM',
-         'CL4M':            'CL4M',
-         'PROB_CACHE':      'ProbCache',
-         'RAND_CHOICE':     'Random (choice)',
-         'RAND_BERNOULLI':  'Random (Bernoulli)',
-         'NO_CACHE':        'No caching',
-         'OPTIMAL':         'Optimal',
-         'NRR':             'NRR'
+RANK_LEGEND = {
+         4:         '4 WORKLOADS',
+         8:         '8 WORKLOADS',
+         16:        '16 WORKLOADS',
+         32:        '32 WORKLOADS'
                     }
 
 # Color and hatch styles for bar charts of cache hit ratio and link load vs topology
-STRATEGY_BAR_COLOR = {
-    'LCE':          'k',
-    'LCD':          '0.4',
-    'NO_CACHE':     '0.5',
-    'HR_ASYMM':     '0.6',
-    'HR_SYMM':      '0.7'
+RANK_BAR_COLOR = {
+    4:      'k',
+    8:      '0.4',
+    16:     '0.5',
+    32:     '0.6'
     }
 
 STRATEGY_BAR_HATCH = {
@@ -97,9 +76,7 @@ STRATEGY_BAR_HATCH = {
     }
 
 
-def plot_cache_hits_vs_group_size(resultset, topology, cache_size, group_size_range, strategies, plotdir):
-    if 'NO_CACHE' in strategies:
-        strategies.remove('NO_CACHE')
+def plot_cache_hits_vs_group_size(resultset, topology, cache_size, group_size_range, ranks, plotdir):
     desc = {}
     desc['title'] = 'Cache hit ratio vs Group size: T=%s C=%s' % (topology, cache_size)
     desc['ylabel'] = 'Cache hit ratio'
@@ -108,20 +85,20 @@ def plot_cache_hits_vs_group_size(resultset, topology, cache_size, group_size_ra
     desc['xvals'] = group_size_range
     desc['filter'] = {'topology': {'name': topology},
                       'cache_placement': {'network_cache': cache_size}}
-    desc['ymetrics'] = [('CACHE_HIT_RATIO', 'MEAN')]*len(strategies)
-    desc['ycondnames'] = [('strategy', 'name')]*len(strategies)
-    desc['ycondvals'] = strategies
+    desc['ymetrics'] = [('CACHE_HIT_RATIO', 'MEAN')]*len(ranks)
+    desc['ycondnames'] = [('workload', 'n_rank')]*len(ranks)
+    desc['ycondvals'] = ranks
     desc['errorbar'] = True
     desc['legend_loc'] = 'upper right'
-    desc['line_style'] = STRATEGY_STYLE
-    desc['legend'] = STRATEGY_LEGEND
+    desc['line_style'] = RANK_STYLE
+    desc['legend'] = RANK_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
     plot_lines(resultset, desc, 'CACHE_HIT_RATIO_VS_GROUP_SIZET=%s@C=%s.pdf'
                % (topology, cache_size), plotdir)
 
     
 
-def plot_latency_vs_group_size(resultset, topology, cache_size, group_size_range, strategies, plotdir):
+def plot_latency_vs_group_size(resultset, topology, cache_size, group_size_range, ranks, plotdir):
     desc = {}
     desc['title'] = 'Latency vs Group Size: T=%s C=%s' % (topology, cache_size)
     desc['xlabel'] = 'Group size'
@@ -130,13 +107,13 @@ def plot_latency_vs_group_size(resultset, topology, cache_size, group_size_range
     desc['xvals'] = group_size_range
     desc['filter'] = {'topology': {'name': topology},
                       'cache_placement': {'network_cache': cache_size}}
-    desc['ymetrics'] = [('LATENCY', 'MEAN')]*len(strategies)
-    desc['ycondnames'] = [('strategy', 'name')]*len(strategies)
-    desc['ycondvals'] = strategies
+    desc['ymetrics'] = [('LATENCY', 'MEAN')]*len(ranks)
+    desc['ycondnames'] = [('workload', 'n_rank')]*len(ranks)
+    desc['ycondvals'] = ranks
     desc['errorbar'] = True
     desc['legend_loc'] = 'upper left'
-    desc['line_style'] = STRATEGY_STYLE
-    desc['legend'] = STRATEGY_LEGEND
+    desc['line_style'] = RANK_STYLE
+    desc['legend'] = RANK_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
     plot_lines(resultset, desc, 'LATENCY_VS_GROUP_SIZET=%s@C=%s.pdf'
                % (topology, cache_size), plotdir)
@@ -167,15 +144,16 @@ def run(config, results, plotdir):
     alphas = settings.ALPHA
     groupsizes = settings.N_SIZES
     strategies = settings.STRATEGIES
+    ranks = settings.N_RANKS
     # Plot graphs
     for topology in topologies:
         for alpha in alphas:
             for cache_size in cache_sizes:
                 logger.info('Plotting cache hit ratio for topology %s and cache size %s vs alpha' % (topology, str(cache_size)))
-                plot_cache_hits_vs_group_size(resultset, topology, cache_size, groupsizes, strategies, plotdir)
+                plot_cache_hits_vs_group_size(resultset, topology, cache_size, groupsizes, ranks, plotdir)
                 
                 logger.info('Plotting latency for topology %s vs cache size %s' % (topology, str(cache_size)))
-                plot_latency_vs_group_size(resultset, topology, cache_size, groupsizes, strategies, plotdir)
+                plot_latency_vs_group_size(resultset, topology, cache_size, groupsizes, ranks, plotdir)
 
 def main():
     parser = argparse.ArgumentParser(__doc__)

@@ -22,17 +22,17 @@ PLOTS_DIR=${CURR_DIR}/$plots_folder
 CONFIG_FILE=${CURR_DIR}/config_cachesize.py
 
 # FIle where results will be saved
-RESULTS_FILE=${CURR_DIR}/results_cachesize.2017.03.28-00.52.52.pickle
+RESULTS_FILE=${CURR_DIR}/results_cachesize.$current_time.pickle
 #touch $RESULTS_FILE
 
 # Add Icarus code to PYTHONPATH
 export PYTHONPATH=${ICARUS_DIR}:$PYTHONPATH
 
 # Run experiments
-#echo "Run experiments"
-#python ${ICARUS_DIR}/icarus.py --results ${RESULTS_FILE} ${CONFIG_FILE}
+echo "Run experiments"
+python ${ICARUS_DIR}/icarus.py --results ${RESULTS_FILE} ${CONFIG_FILE}
 
 # Plot results
-echo "Plot results"
-python ${CURR_DIR}/plotresults_cachesize.py --results ${RESULTS_FILE} --output ${PLOTS_DIR} ${CONFIG_FILE} 
+#echo "Plot results"
+#python ${CURR_DIR}/plotresults_cachesize.py --results ${RESULTS_FILE} --output ${PLOTS_DIR} ${CONFIG_FILE} 
 
