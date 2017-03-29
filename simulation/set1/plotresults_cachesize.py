@@ -44,21 +44,27 @@ PLOT_EMPTY_GRAPHS = True
 # Off-path strategies: solid lines
 # On-path strategies: dashed lines
 # No-cache: dotted line
-GROUP_STYLE = {
-         'GROUP':         'b-o',
-         'NOTGROUP':        'g-D'
+RANKGROUP_STYLE = {
+         '4,GROUP':         'b-o',
+         '4,NOTGROUP':      'b-D',
+         '32,GROUP':        'g-o',
+         '32,NOTGROUP':     'g-D'
                 }
 
 # This dict maps name of strategies to names to be displayed in the legend
-GROUP_LEGEND = {
-         'GROUP':           'GROUP',
-         'NOTGROUP':        'NOTGROUP'
+RANKGROUP_LEGEND = {
+         '4,GROUP':         '4rank_group',
+         '4,NOTGROUP':      '4rank_notgroup',
+         '32,GROUP':        '32rank_group',
+         '32,NOTGROUP':     '32rank_notgroup'
                     }
 
 # Color and hatch styles for bar charts of cache hit ratio and link load vs topology
-GROUP_BAR_COLOR = {
-    'GROUP':          'k',
-    'NOTGROUP':          '0.4'
+RANKGROUP_BAR_COLOR = {
+    '4GROUP':          'k',
+    '4NOTGROUP':       '0.4',
+    '32GROUP':         '0.6',
+    '32NOTGROUP':      '0.8'
     }
 
 STRATEGY_BAR_HATCH = {
@@ -70,7 +76,7 @@ STRATEGY_BAR_HATCH = {
     }
 
 
-def plot_cache_hits_vs_cache_size(resultset, topology, cache_size_range, groups, plotdir):
+def plot_cache_hits_vs_cache_size(resultset, topology, cache_size_range, rank_groups, plotdir):
     desc = {}
     desc['title'] = 'Cache hit ratio vs cache size: T=%s ' % (topology)
     desc['ylabel'] = 'Cache hit ratio'
@@ -78,20 +84,20 @@ def plot_cache_hits_vs_cache_size(resultset, topology, cache_size_range, groups,
     desc['xparam'] = ('cache_placement','network_cache')
     desc['xvals'] = cache_size_range
     desc['filter'] = {'topology': {'name': topology}}
-    desc['ymetrics'] = [('CACHE_HIT_RATIO', 'MEAN')]*len(groups)
-    desc['ycondnames'] = [('group', 'name')]*len(groups)
-    desc['ycondvals'] = groups
+    desc['ymetrics'] = [('CACHE_HIT_RATIO', 'MEAN')]*len(rank_groups)
+    desc['ycondnames'] = [('rankgroup', 'name')]*len(rank_groups)
+    desc['ycondvals'] = rank_groups
     desc['errorbar'] = True
     desc['legend_loc'] = 'upper right'
-    desc['line_style'] = GROUP_STYLE
-    desc['legend'] = GROUP_LEGEND
+    desc['line_style'] = RANKGROUP_STYLE
+    desc['legend'] = RANKGROUP_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
     plot_lines(resultset, desc, 'CACHE_HIT_RATIO_VS_CACHE_SIZET=%s.pdf'
                % topology, plotdir)
 
     
 
-def plot_latency_vs_cache_size(resultset, topology, cache_size_range, groups, plotdir):
+def plot_latency_vs_cache_size(resultset, topology, cache_size_range, rank_groups, plotdir):
     desc = {}
     desc['title'] = 'Latency vs cache Size: T=%s' % (topology)
     desc['xlabel'] = 'Cache size'
@@ -99,13 +105,13 @@ def plot_latency_vs_cache_size(resultset, topology, cache_size_range, groups, pl
     desc['xparam'] = ('cache_placement','network_cache')
     desc['xvals'] = cache_size_range
     desc['filter'] = {'topology': {'name': topology}}
-    desc['ymetrics'] = [('LATENCY', 'MEAN')]*len(groups)
-    desc['ycondnames'] = [('group', 'name')]*len(groups)
-    desc['ycondvals'] = groups
+    desc['ymetrics'] = [('LATENCY', 'MEAN')]*len(rank_groups)
+    desc['ycondnames'] = [('rankgroup', 'name')]*len(rank_groups)
+    desc['ycondvals'] = rank_groups
     desc['errorbar'] = True
     desc['legend_loc'] = 'upper left'
-    desc['line_style'] = GROUP_STYLE
-    desc['legend'] = GROUP_LEGEND
+    desc['line_style'] = RANKGROUP_STYLE
+    desc['legend'] = RANKGROUP_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
     plot_lines(resultset, desc, 'LATENCY_VS_CACHE_SIZET=%s.pdf'
                % topology, plotdir)
@@ -135,15 +141,16 @@ def run(config, results, plotdir):
     topologies = settings.TOPOLOGIES
     alphas = settings.ALPHA
     groups = settings.GROUPS
-    strategies = settings.STRATEGIES
+    ranks = settings.N_RANKS
+    rank_groups = settings.RANK_GROUPS
     # Plot graphs
     for topology in topologies:
         for alpha in alphas:
             logger.info('Plotting cache hit ratio for topology %s vs cache size' % (topology))
-            plot_cache_hits_vs_cache_size(resultset, topology, cache_sizes, groups, plotdir)
+            plot_cache_hits_vs_cache_size(resultset, topology, cache_sizes,rank_groups, plotdir)
             
             logger.info('Plotting latency for topology %s vs cache size' % (topology))
-            plot_latency_vs_cache_size(resultset, topology, cache_sizes, groups,plotdir)
+            plot_latency_vs_cache_size(resultset, topology, cache_sizes, rank_groups,plotdir)
 
 def main():
     parser = argparse.ArgumentParser(__doc__)

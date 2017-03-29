@@ -30,7 +30,7 @@ RESULTS_FORMAT = 'PICKLE'
 
 # Number of times each experiment is replicated
 # This is necessary for extracting confidence interval of selected metrics
-N_REPLICATIONS = 30
+N_REPLICATIONS = 1
 
 # List of metrics to be measured in the experiments
 # The implementation of data collectors are located in ./icaurs/execution/collectors.py
@@ -53,7 +53,7 @@ ALPHA = [1.0]
 # Total size of network cache as a fraction of content population
 #80 percent contents can be cached intra group
 
-NETWORK_CACHE = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1]
+NETWORK_CACHE = [0.01, 0.02, 0.03, 0.04, 0.05]#, 0.06, 0.07, 0.08, 0.09, 0.1]
 # Number of content objects
 N_CONTENTS = 3*10**4
 
@@ -101,6 +101,19 @@ GROUPS = [
             'GROUP',
             'NOTGROUP'
             ]
+
+"""RANK_GROUPS = [
+            '4GROUP',
+            '4NOTGROUP',
+            '32GROUP',
+            '32NOTGROUP'
+            ]"""
+RANK_GROUPS = ["" for x in range(len(N_RANKS)*len(GROUPS))]
+index = 0
+for i in N_RANKS:
+    for j in GROUPS:
+        RANK_GROUPS[index] = str(i) + ',' + j
+        index += 1
 # Cache replacement policy used by the network caches.
 # Supported policies are: 'LRU', 'LFU', 'FIFO', 'RAND' and 'NULL'
 # Cache policy implmentations are located in ./icarus/models/cache.py
@@ -127,21 +140,22 @@ for alpha in ALPHA:
     for strategy in STRATEGIES:
         for topology in TOPOLOGIES:
             for network_cache in NETWORK_CACHE:
-                for n_rank in N_RANKS:
-                    for n_size in N_SIZES:
-                        experiment = copy.deepcopy(default)
-                        if n_size == 10 :
-                            experiment['group']['name'] = 'GROUP'
-                        else:
-                            experiment['group']['name'] = 'NOTGROUP'
-                        experiment['workload']['alpha'] = alpha
-                        experiment['workload']['n_rank'] = n_rank
-                        #overall number of workloads remain same, workloads intra group changes according to size
-                        experiment['workload']['rank_per_group'] = float(n_rank/(N_NODE/n_size))
-                        experiment['strategy']['name'] = strategy
-                        experiment['topology']['name'] = topology
-                        experiment['topology']['n_node'] = N_NODE
-                        experiment['topology']['n_member'] = n_size
-                        experiment['cache_placement']['network_cache'] = network_cache
-                        experiment['desc'] = "Alpha: %s, strategy: %s,  network cache: %s, topology: Edgefog, num of workloads: %s,  num of datastore: %s, group size: %s. " % (str(alpha), strategy, str(network_cache), str(n_rank), str(N_CORE), str(n_size) )
-                        EXPERIMENT_QUEUE.append(experiment)
+                for rankgroup in RANK_GROUPS:
+                    experiment = copy.deepcopy(default)
+                    experiment['rankgroup']['name'] = rankgroup
+                    experiment['group']['name'] = rankgroup.split(',')[1]
+                    experiment['workload']['n_rank'] = int(rankgroup.split(',')[0])
+                    experiment['workload']['alpha'] = alpha
+                    #overall number of workloads remain same, workloads intra group changes according to size
+                    if experiment['group']['name'] == 'GROUP':
+                        experiment['topology']['n_member'] = int(N_NODE/experiment['workload']['n_rank'])
+                        experiment['workload']['rank_per_group'] = int(1)
+                    else:
+                        experiment['topology']['n_member'] = int(N_NODE) 
+                        experiment['workload']['rank_per_group'] = int(experiment['workload']['n_rank'])
+                    experiment['strategy']['name'] = strategy
+                    experiment['topology']['name'] = topology
+                    experiment['topology']['n_node'] = N_NODE
+                    experiment['cache_placement']['network_cache'] = network_cache
+                    experiment['desc'] = "Alpha: %s, strategy: %s,  network cache: %s, topology: Edgefog, num of datastore: %s, rank&group: %s. " % (str(alpha), strategy, str(network_cache), str(N_CORE),rankgroup )
+                    EXPERIMENT_QUEUE.append(experiment)
