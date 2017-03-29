@@ -30,7 +30,7 @@ RESULTS_FORMAT = 'PICKLE'
 
 # Number of times each experiment is replicated
 # This is necessary for extracting confidence interval of selected metrics
-N_REPLICATIONS = 1
+N_REPLICATIONS = 10
 
 # List of metrics to be measured in the experiments
 # The implementation of data collectors are located in ./icaurs/execution/collectors.py
@@ -55,19 +55,21 @@ ALPHA = [1.0]
 NETWORK_CACHE = [0.1]
 
 # Number of content objects
-N_CONTENTS = 3*10**4
+#N_CONTENTS = 3*10**4
+N_CONTENTS = 32*10**4
 
 # Number of requests per second (over the whole network)
 NETWORK_REQUEST_RATE = 300.0
 
 # Number of content requests generated to prepopulate the caches
 # These requests are not logged
-N_WARMUP_REQUESTS = 6*10**4
+#N_WARMUP_REQUESTS = 6*10**4
+N_WARMUP_REQUESTS = 64*10**4
 
 # Number of content requests generated after the warmup and logged
 # to generate results. 
-N_MEASURED_REQUESTS = 6*10**5
-
+#N_MEASURED_REQUESTS = 6*10**5
+N_MEASURED_REQUESTS = 64*10**4
 # Number of workload ranks over all nodes 
 N_RANKS = [
             4,
@@ -108,7 +110,7 @@ EXPERIMENT_QUEUE = deque()
 default = Tree()
 default['workload'] = {'name':       'DIFFRANK',
                        #'n_rank':     N_RANK,
-                       'n_contents': N_CONTENTS,
+                       #'n_contents': N_CONTENTS,
                        'n_warmup':   N_WARMUP_REQUESTS,
                        'n_measured': N_MEASURED_REQUESTS,
                        'rate':       NETWORK_REQUEST_RATE
@@ -131,7 +133,8 @@ for alpha in ALPHA:
                         #overall number of workloads remain same, workloads intra group changes according to size
                         experiment['workload']['n_rank'] = n_rank 
                         experiment['workload']['rank_per_group'] = float(n_rank/(N_NODE/n_size))
-                        experiment['strategy']['name'] = strategy
+                        experiment['workload']['n_contents'] = N_CONTENTS/n_rank
+			experiment['strategy']['name'] = strategy
                         experiment['topology']['name'] = topology
                         experiment['topology']['n_node'] = N_NODE
                         experiment['topology']['n_member'] = n_size

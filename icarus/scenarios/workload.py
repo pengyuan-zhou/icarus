@@ -53,7 +53,7 @@ class DiffrankWorkload(object):
             self.topology.node[v]['rank'] = random.choice(array.array('i',(i for i in 
                 range(int(rank_per_group*g-rank_per_group+1),int(math.ceil(rank_per_group*g+1)))))) 
         self.n_contents = n_contents
-        self.contents_range = int(n_contents * n_rank)
+        self.contents_range = int(n_contents * 32)
         self.contents = range(1, self.contents_range + 1)
         self.zipf = TruncatedZipfDist(alpha, self.n_contents)
         self.n_rank = int(n_rank)
