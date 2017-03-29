@@ -53,7 +53,7 @@ ALPHA = [1.0]
 # Total size of network cache as a fraction of content population
 #80 percent contents can be cached intra group
 
-NETWORK_CACHE = [0.01, 0.02, 0.03, 0.04, 0.05]#, 0.06, 0.07, 0.08, 0.09, 0.1]
+NETWORK_CACHE = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1]
 # Number of content objects
 N_CONTENTS = 3*10**4
 
