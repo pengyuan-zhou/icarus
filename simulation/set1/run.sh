@@ -22,15 +22,16 @@ PLOTS_DIR=${CURR_DIR}/$plots_folder
 CONFIG_FILE=${CURR_DIR}/config.py
 
 # FIle where results will be saved
-RESULTS_FILE=${CURR_DIR}/results.$current_time.pickle
+RESULTS_FILE=${CURR_DIR}/jussi10results.2017.03.29-19.14.00.pickle
+#results.$current_time.pickle
 #touch $RESULTS_FILE
 
 # Add Icarus code to PYTHONPATH
 export PYTHONPATH=${ICARUS_DIR}:$PYTHONPATH
 
 # Run experiments
-echo "Run experiments"
-python ${ICARUS_DIR}/icarus.py --results ${RESULTS_FILE} ${CONFIG_FILE}
+#echo "Run experiments"
+#python ${ICARUS_DIR}/icarus.py --results ${RESULTS_FILE} ${CONFIG_FILE}
 
 # Plot results
 echo "Plot results"
