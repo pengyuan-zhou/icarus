@@ -22,7 +22,7 @@ PLOTS_DIR=${CURR_DIR}/$plots_folder
 CONFIG_FILE=${CURR_DIR}/config.py
 
 # FIle where results will be saved
-RESULTS_FILE=${CURR_DIR}/jussi10results.2017.03.29-19.14.00.pickle
+RESULTS_FILE=${CURR_DIR}/jussi30groupsizeresults.2017.03.29-18.46.13.pickle
 #results.$current_time.pickle
 #touch $RESULTS_FILE
 

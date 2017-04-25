@@ -22,7 +22,7 @@ PLOTS_DIR=${CURR_DIR}/$plots_folder
 CONFIG_FILE=${CURR_DIR}/config_cachesize.py
 
 # FIle where results will be saved
-RESULTS_FILE=${CURR_DIR}/jussi10results_cachesize.2017.03.29-19.16.03.pickle
+RESULTS_FILE=${CURR_DIR}/jussi30results_cachesize.2017.03.29-19.12.02.pickle 
 #results_cachesize.$current_time.pickle
 #touch $RESULTS_FILE
 
