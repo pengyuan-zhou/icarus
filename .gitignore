@@ -1,4 +1,5 @@
 # Ignore binaries and temp files
+**/*.pyc
 *.pyc
 __pycache__
 *~ 
