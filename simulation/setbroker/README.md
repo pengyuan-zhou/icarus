@@ -1,4 +1,4 @@
-For Mecomm simulation.
+For ICN simulation.
 
 
 ## Run
@@ -16,7 +16,7 @@ specific results based on `icarus.results.plot` functions.
 ##simulation process
 important args:
 
-N_CORE:  number of datastore (set to 1)
+N_CORE:  number of datastore 
 N_NODE: number of overall caching nodes 
 N_SIZES: list of group size
 N_RANK: number of overall workloads rank(one rank indicates one workload)
@@ -32,7 +32,6 @@ When "group size" equals to number of nodes, there is only one group, meaning th
 All workloads are distributed to nodes randomly. All nodes fetch data from data store.
 
 
-Member can only get to datastore via leader.
 Leader can only get to another leader via datastore.
 
  
