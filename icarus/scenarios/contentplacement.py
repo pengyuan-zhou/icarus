@@ -30,8 +30,8 @@ def get_sources(topology):
     return [v for v in topology if topology.node[v]['stack'][0] == 'source']
 
 @register_content_placement('UNIFORM')
-def uniform_content_placement(topology, contents, seed=None):
-    """Places content objects to source nodes randomly following a uniform
+def uniform_content_placement(topology, rank_sum, contents, seed=None):
+    """Places content sets to source nodes randomly following a uniform
     distribution.
 
     Parameters
@@ -56,8 +56,18 @@ def uniform_content_placement(topology, contents, seed=None):
     random.seed(seed)
     source_nodes = get_sources(topology)
     content_placement = collections.defaultdict(set)
-    for c in contents:
-        content_placement[random.choice(source_nodes)].add(c)
+    #assuming each source node as a publisher, size_set is its content set size
+    size = int(len(contents)/len(source_nodes))
+    i = 0
+    for v in source_nodes:
+        #the last source node will have slide more contents than others, to cover all the contents in the global set
+        if (i == (len(source_nodes)-1)):
+            for c in contents[(size*i+1):]
+                content_placement[random.choice(v)].add(c)
+        else:
+            for c in contents[(size*i+1):(size*(i+1)+1)]
+                content_placement[random.choice(v)].add(c)
+        i+=1
     apply_content_placement(content_placement, topology)
 
 @register_content_placement('WEIGHTED')

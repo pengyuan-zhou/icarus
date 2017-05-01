@@ -230,7 +230,7 @@ def run_scenario(settings, params, curr_exp, n_exp):
             logger.error('No content placement implementation named %s was found.'
                          % contpl_name)
             return None
-        CONTENT_PLACEMENT[contpl_name](topology, workload.contents, **contpl_spec)
+        CONTENT_PLACEMENT[contpl_name](topology, workload.rank_sum, workload.contents, **contpl_spec)
 
         # caching and routing strategy definition
         strategy = tree['strategy']

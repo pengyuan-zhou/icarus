@@ -143,8 +143,13 @@ def topology_rocketfuel_latency(asn, source_ratio=0.1, ext_delay=EXTERNAL_LINK_D
     topology.graph['icr_candidates'] = set(routers)
     for v in sources:
         fnss.add_stack(topology, v, 'source')
+    print (asn)
+    print (sources)
+    print (len(sources))
     for v in receivers:
         fnss.add_stack(topology, v, 'receiver')
     for v in routers:
         fnss.add_stack(topology, v, 'router')
+    print (len(receivers))
+    print (len(routers))
     return IcnTopology(topology)
