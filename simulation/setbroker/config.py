@@ -146,7 +146,7 @@ EXPERIMENT_QUEUE = deque()
 default = Tree()
 
 #default['topology']['name'] = 'ROCKET_FUEL'
-default['topology']['asn'] = 6461
+default['topology']['asn'] = 0000
 
 #default['test_strategy'] = {
                             #'name': 'EDGE'
