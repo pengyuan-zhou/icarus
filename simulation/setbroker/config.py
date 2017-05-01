@@ -95,8 +95,8 @@ TOPOLOGIES =  [
 #               'TISCALI'
                ]
 
-ASNS = [
-        0000#,
+#ASNS = [
+        #0000#,
         #1239,
         #1755,
         #3257,
@@ -146,7 +146,7 @@ EXPERIMENT_QUEUE = deque()
 default = Tree()
 
 #default['topology']['name'] = 'ROCKET_FUEL'
-#default['topology']['asn'] = 1755
+default['topology']['asn'] = 6461
 
 #default['test_strategy'] = {
                             #'name': 'EDGE'
