@@ -23,6 +23,8 @@ import array
 import math
 import networkx as nx
 
+from random import random as rm
+from bisect import bisect
 from icarus.tools import TruncatedZipfDist
 from icarus.registry import register_workload
 
@@ -47,7 +49,7 @@ class DiffrankWorkload(object):
         #request distributions are uniform distributed to users
         ranks = [i for i in range(rank_sum)]
         #uniform distribution of request patterns
-        weights= [float(1.0/ranksum)] * ranksum
+        weights= [float(1.0/rank_sum)] * rank_sum
         for v in self.receivers:
             rank_choose = weighted_choice(ranks, weights)
             self.topology.node[v]['rank'] = rank_choose
@@ -93,6 +95,6 @@ def weighted_choice(values, weights):
     for w in weights:
         total += w
         cum_weights.append(total)
-    x = random() * total
+    x = rm() * total
     i = bisect(cum_weights, x)
     return values[i]

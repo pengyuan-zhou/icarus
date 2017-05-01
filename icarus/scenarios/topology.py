@@ -28,6 +28,15 @@ __all__ = [
            ]
 
 
+
+# Delays
+# These values are suggested by this Computer Networks 2011 paper:
+# http://www.cs.ucla.edu/classes/winter09/cs217/2011CN_NameRouting.pdf
+# which is citing as source of this data, measurements from this IMC'06 paper:
+# http://www.mpi-sws.org/~druschel/publications/ds2-imc.pdf
+INTERNAL_LINK_DELAY = 2
+EXTERNAL_LINK_DELAY = 34
+
 # Path where all topologies are stored
 TOPOLOGY_RESOURCES_DIR = path.abspath(path.join(path.dirname(__file__),
                                                 path.pardir, path.pardir,
@@ -106,6 +115,7 @@ def topology_rocketfuel_latency(asn, source_ratio=0.1, ext_delay=EXTERNAL_LINK_D
     # Note: I don't need to filter out nodes with degree 1 cause they all have
     # a greater degree value but we compute degree to decide where to attach sources
     routers = topology.nodes()
+
     # Source attachment
     n_sources = int(source_ratio * len(routers))
     sources = ['src_%d' % i for i in range(n_sources)]

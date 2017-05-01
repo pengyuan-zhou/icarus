@@ -60,6 +60,8 @@ class NearestReplicaRouting(Strategy):
     @inheritdoc(Strategy)
     def process_event(self, time, receiver, content, log):
         # get all required data
+        #check if content belonging to sharing set
+        #self.controller.sharingcheck(content)
         locations = self.view.content_locations(content)
         #print (receiver, content, locations)
         nearest_replica = min(locations, key=lambda x: self.distance[receiver][x])

@@ -95,14 +95,14 @@ TOPOLOGIES =  [
 #               'TISCALI'
                ]
 
-#ASNS = [
-        #0000#,
+ASNS = [
+        1010,
         #1239,
         #1755,
-        #3257,
+        3257,
         #3967,
-        #6461
-        #]
+        6461
+        ]
 
 
 # List of caching and routing strategies
@@ -146,7 +146,7 @@ EXPERIMENT_QUEUE = deque()
 default = Tree()
 
 #default['topology']['name'] = 'ROCKET_FUEL'
-default['topology']['asn'] = 0000
+#default['topology']['asn'] = 0000
 
 #default['test_strategy'] = {
                             #'name': 'EDGE'
@@ -175,14 +175,15 @@ for rank_sum in RANK_SUM:
     for alpha in ALPHA:
         for network_cache in NETWORK_CACHE:
             for topology in TOPOLOGIES:
-                for strategy in STRATEGIES:
-                    for diff in DIFF:
-                        for workload in WORKLOADS:
-                            for rank_diff in RANK_DIFF:
-                                for network_cache in NETWORK_CACHE:
-
+                for asn in ASNS:
+                    for strategy in STRATEGIES:
+                        for diff in DIFF:
+                            for workload in WORKLOADS:
+                                for rank_diff in RANK_DIFF:
+                                    for network_cache in NETWORK_CACHE:
                                         experiment = copy.deepcopy(default)
                                         experiment['topology']['name'] = topology
+                                        experiment['topology']['asn'] = asn
                                         experiment['workload']['name'] = workload
                                         experiment['workload']['rank_diff'] = rank_diff
                                         experiment['workload']['rank_sum'] = rank_sum
@@ -194,4 +195,4 @@ for rank_sum in RANK_SUM:
                                         experiment['cache_placement']['network_cache'] = network_cache
                                         experiment['desc'] = "topology: %s, strategy: %s, diff: %s, Alpha: %s, rank_sum: %s, workload :%s, rank_diff: %s,  network cache: %s" \
                                     % (topology, strategy, str(diff), str(alpha), str(rank_sum), workload, str(rank_diff), str(network_cache))
-                                EXPERIMENT_QUEUE.append(experiment)
+                            EXPERIMENT_QUEUE.append(experiment)
