@@ -34,29 +34,29 @@ __all__ = [
 @register_workload('DIFFRANK')
 class DiffrankWorkload(object):
     #different rankings with same alpha
-    def __init__(self, topology,  n_contents, n_rank, rank_per_group, alpha, beta=0, 
-            rate=1.0, n_warmup=10**5, n_measured=4*10**5, seed=None, **kwargs):
+    def __init__(self, topology, diff, rank_diff, n_contents, rank_sum, alpha, beta=0, rate=1.0, n_warmup=10**5, n_measured=4*10**5, seed=None, **kwargs):
         if alpha < 0:
             raise ValueError('alpha must be positive')
         if beta < 0:
             raise ValueError('beta must be positive')
-        self.receivers = [v for v in topology.nodes_iter() 
-                if topology.node[v]['stack'][0] == 'receiver']
+        self.receivers = [v for v in topology.nodes_iter() if topology.node[v]['stack'][0] == 'receiver']
+        self.diff = diff
         self.topology = topology
-        rank_lst = array.array('i',(i for i in range(1,(n_rank+1))))
-        
-        
-        #differentiate requests distribution inter groups, each group has $rank_per_group distributions.
-        # when num_of_group>N_NODE, multiple groups share a same workload  
+        rank_choose = 0
+
+        #request distributions are uniform distributed to users
+        ranks = [i for i in range(rank_sum)]
+        #uniform distribution of request patterns
+        weights= [float(1.0/ranksum)] * ranksum
         for v in self.receivers:
-            g = self.topology.node[v]['group']
-            self.topology.node[v]['rank'] = random.choice(array.array('i',(i for i in 
-                range(int(rank_per_group*g-rank_per_group+1),int(math.ceil(rank_per_group*g+1)))))) 
+            rank_choose = weighted_choice(ranks, weights)
+            self.topology.node[v]['rank'] = rank_choose
         self.n_contents = n_contents
-        self.contents_range = int(n_contents * n_rank)
+        self.contents_range = int(n_contents * (1 + rank_diff * (rank_sum - 1)))
         self.contents = range(1, self.contents_range + 1)
         self.zipf = TruncatedZipfDist(alpha, self.n_contents)
-        self.n_rank = int(n_rank)
+        self.rank_diff = rank_diff
+        self.rank_sum = rank_sum
         self.alpha = alpha
         self.rate = rate
         self.n_warmup = n_warmup
@@ -67,7 +67,7 @@ class DiffrankWorkload(object):
             degree = nx.degree(self.topology)
             self.receivers = sorted(self.receivers, key=lambda x: degree[iter(topology.edge[x]).next()], reverse=True)
             self.receiver_dist = TruncatedZipfDist(beta, len(self.receivers))
-
+        
     def __iter__(self):
         req_counter = 0
         t_event = 0.0
@@ -78,11 +78,21 @@ class DiffrankWorkload(object):
             else:
                 receiver = self.receivers[self.receiver_dist.rv()-1]
             self.receiver = receiver
-            rank_receiver = int(self.topology.node[self.receiver]['rank']-1)
-            content = int(self.zipf.rv()) + self.n_contents * rank_receiver
-            #print ("content:%d, self.n_contents:%d, rank_receiver:%d") % (content, self.n_contents, rank_receiver)
+            rank_receiver = self.topology.node[self.receiver]['rank']
+            content = int(self.zipf.rv()) + self.n_contents * self.rank_diff * rank_receiver
             log = (req_counter >= self.n_warmup)
             event = {'receiver': receiver, 'content': content, 'log': log}
             yield (t_event, event)
             req_counter += 1
         raise StopIteration()
+
+      
+def weighted_choice(values, weights):
+    total = 0
+    cum_weights = []
+    for w in weights:
+        total += w
+        cum_weights.append(total)
+    x = random() * total
+    i = bisect(cum_weights, x)
+    return values[i]
