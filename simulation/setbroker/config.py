@@ -87,7 +87,8 @@ N_MEASURED_REQUESTS = 6*10**2
 # List of all implemented topologies
 # Topology implementations are located in ./icarus/scenarios/topology.py
 TOPOLOGIES =  [
-               'ROCKET_FUEL'
+                'MULTIAS'
+#               'ROCKET_FUEL'
 #               'GEANT'#,
 #               'DATACENTER'
 #               'GEANT'
@@ -96,8 +97,8 @@ TOPOLOGIES =  [
                ]
 
 ASNS = [
-        1010,
-        #1239,
+        #1010,
+        1239,
         #1755,
         3257,
         #3967,
@@ -175,24 +176,23 @@ for rank_sum in RANK_SUM:
     for alpha in ALPHA:
         for network_cache in NETWORK_CACHE:
             for topology in TOPOLOGIES:
-                for asn in ASNS:
-                    for strategy in STRATEGIES:
-                        for diff in DIFF:
-                            for workload in WORKLOADS:
-                                for rank_diff in RANK_DIFF:
-                                    for network_cache in NETWORK_CACHE:
-                                        experiment = copy.deepcopy(default)
-                                        experiment['topology']['name'] = topology
-                                        experiment['topology']['asn'] = asn
-                                        experiment['workload']['name'] = workload
-                                        experiment['workload']['rank_diff'] = rank_diff
-                                        experiment['workload']['rank_sum'] = rank_sum
-                                        experiment['workload']['network_cache'] = network_cache
-                                        experiment['workload']['diff'] = diff
-                                        experiment['workload']['alpha'] = alpha
-                                        experiment['strategy']['name'] = strategy
-                                        #experiment['topology']['asn'] = asn
-                                        experiment['cache_placement']['network_cache'] = network_cache
-                                        experiment['desc'] = "topology: %s, strategy: %s, diff: %s, Alpha: %s, rank_sum: %s, workload :%s, rank_diff: %s,  network cache: %s" \
-                                    % (topology, strategy, str(diff), str(alpha), str(rank_sum), workload, str(rank_diff), str(network_cache))
-                            EXPERIMENT_QUEUE.append(experiment)
+				for strategy in STRATEGIES:
+					for diff in DIFF:
+						for workload in WORKLOADS:
+							for rank_diff in RANK_DIFF:
+								for network_cache in NETWORK_CACHE:
+									experiment = copy.deepcopy(default)
+									experiment['topology']['name'] = topology
+									experiment['topology']['asns'] = ASNS
+									experiment['workload']['name'] = workload
+									experiment['workload']['rank_diff'] = rank_diff
+									experiment['workload']['rank_sum'] = rank_sum
+									experiment['workload']['network_cache'] = network_cache
+									experiment['workload']['diff'] = diff
+									experiment['workload']['alpha'] = alpha
+									experiment['strategy']['name'] = strategy
+									#experiment['topology']['asn'] = asn
+									experiment['cache_placement']['network_cache'] = network_cache
+									experiment['desc'] = "topology: %s, strategy: %s, diff: %s, Alpha: %s, rank_sum: %s, workload :%s, rank_diff: %s,  network cache: %s" \
+								% (topology, strategy, str(diff), str(alpha), str(rank_sum), workload, str(rank_diff), str(network_cache))
+						EXPERIMENT_QUEUE.append(experiment)
