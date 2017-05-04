@@ -796,7 +796,7 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
     # First mark all current links as inernal
     for topology in topologylist:
         j = topologylist.index(topology)
-        while j>=0:
+        while j>=1:
             topology=nx.relabel_nodes(topology,mapping, copy=False)
             j -= 1
     for topology in topologylist:
@@ -866,7 +866,7 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
             fnss.add_stack(topo_multiAS, v, 'receiver')
         for v in routerslistsort[j]:
             fnss.add_stack(topo_multiAS, v, 'router')
-        
+        print (topo_multiAS.nodes()) 
     return IcnTopology(topo_multiAS)
 
 def mapping(x):
