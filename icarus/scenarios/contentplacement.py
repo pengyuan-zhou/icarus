@@ -62,10 +62,10 @@ def uniform_content_placement(topology, rank_sum, contents, seed=None):
     for v in source_nodes:
         #the last source node will have slide more contents than others, to cover all the contents in the global set
         if (i == (len(source_nodes)-1)):
-            for c in contents[(size*i+1):]
+            for c in contents[(size*i+1):]:
                 content_placement[random.choice(v)].add(c)
         else:
-            for c in contents[(size*i+1):(size*(i+1)+1)]
+            for c in contents[(size*i+1):(size*(i+1)+1)]:
                 content_placement[random.choice(v)].add(c)
         i+=1
     apply_content_placement(content_placement, topology)
