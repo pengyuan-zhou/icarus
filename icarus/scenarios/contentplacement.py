@@ -23,14 +23,14 @@ def apply_content_placement(placement, topology):
     topology : Topology
         The topology
     """
+    i=0
     for v, contents in placement.items():
         topology.node[v]['stack'][1]['contents'] = contents
-
 def get_sources(topology):
     return [v for v in topology if topology.node[v]['stack'][0] == 'source']
 
 @register_content_placement('UNIFORM')
-def uniform_content_placement(topology, rank_sum, contents, seed=None):
+def uniform_content_placement(topology, asns, rank_sum, contents, seed=None):
     """Places content sets to source nodes randomly following a uniform
     distribution.
 
@@ -56,18 +56,28 @@ def uniform_content_placement(topology, rank_sum, contents, seed=None):
     random.seed(seed)
     source_nodes = get_sources(topology)
     content_placement = collections.defaultdict(set)
-    #assuming each source node as a publisher, size_set is its content set size
-    size = int(len(contents)/len(source_nodes))
-    i = 0
-    for v in source_nodes:
+    numSource = len(source_nodes)/len(asns) #the number of source nodes in each AS ## only for when signing eaualing number of nodes 
+    #we divide content by source nodes in each AS
+    size = int(len(contents)/numSource) #source in diff ASes have same contents,which doesn't influence since we block inter AS transfer by defining largeinter AS delay
+    source_nodes = sorted(source_nodes)
+    #we define different zize of publishers(number of connected ASes)
+    #through combining source nodes, i.e., if let src_AS0_0 store the
+    #same content set with src_AS0_0, then they are one publisher
+    #that can let us define different publishers connected with different ASes.
+    v=0
+    while v < len(source_nodes):
         #the last source node will have slide more contents than others, to cover all the contents in the global set
-        if (i == (len(source_nodes)-1)):
-            for c in contents[(size*i+1):]:
-                content_placement[random.choice(v)].add(c)
-        else:
-            for c in contents[(size*i+1):(size*(i+1)+1)]:
-                content_placement[random.choice(v)].add(c)
-        i+=1
+        # only for when signing eaualing number of nodes
+        i = 0
+        while i < numSource: 
+            if (i == numSource-1):
+                for c in contents[(size*i):]:
+                    content_placement[source_nodes[v]].add(c)
+            else:
+                for c in contents[size*i:size*(i+1)]:
+                    content_placement[source_nodes[v]].add(c)
+            i += 1 
+            v += 1
     apply_content_placement(content_placement, topology)
 
 @register_content_placement('WEIGHTED')

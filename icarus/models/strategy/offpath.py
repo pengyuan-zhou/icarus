@@ -26,7 +26,7 @@ class NearestReplicaRouting(Strategy):
     metacaching policies. LCE and LCD are currently supported.
     """
 
-    def __init__(self, view, controller, metacaching= 'LCE', implementation='ideal',
+    def __init__(self, view, controller, sharedSet, metacaching= 'LCE', implementation='ideal',
                  radius=4, **kwargs):
         """Constructor
 
@@ -51,20 +51,21 @@ class NearestReplicaRouting(Strategy):
             raise ValueError("Metacaching policy %s not supported" % metacaching)
         if implementation not in ('ideal', 'approx_1', 'approx_2'):
             raise ValueError("Implementation %s not supported" % implementation)
-        self.metacaching = 'LCD'
+        self.metacaching = 'LCE'
         self.implementation = implementation
         self.radius = radius
+        self.sharedset = sharedSet
         self.distance = nx.all_pairs_dijkstra_path_length(self.view.topology(),
                                                           weight='delay')
 
     @inheritdoc(Strategy)
     def process_event(self, time, receiver, content, log):
         # get all required data
-        #check if content belonging to sharing set
-        #self.controller.sharingcheck(content)
+        #map content to sharedID if it's a sharedcontent
+        #content = self.controller.broker_map(content, self.sharedset)
         locations = self.view.content_locations(content)
-        #print (receiver, content, locations)
         nearest_replica = min(locations, key=lambda x: self.distance[receiver][x])
+        #print (locations)
         # Route request to nearest replica
         self.controller.start_session(time, receiver, content, log)
         if self.implementation == 'ideal':

@@ -35,6 +35,7 @@ def uniform_cache_placement(topology, cache_budget, **kwargs):
     cache_budget : int
         The cumulative cache budget
     """
+    print (topology.cache_nodes())
     icr_candidates = topology.graph['icr_candidates']
     cache_size = iround(cache_budget / len(icr_candidates))
     for v in icr_candidates:
@@ -74,7 +75,6 @@ def betweenness_centrality_cache_placement(topology, cache_budget, **kwargs):
     icr_candidates = topology.graph['icr_candidates']
     for v in icr_candidates:
         topology.node[v]['stack'][1]['cache_size'] = iround(cache_budget * betw[v] / total_betw)
-
 
 @register_cache_placement('CONSOLIDATED')
 def uniform_consolidated_cache_placement(topology, cache_budget, spread=0.5,

@@ -91,12 +91,11 @@ class NetworkView(object):
         nodes : set
             A set of all nodes currently storing the given content
         """
+        #print (self.model.cache)
         loc = set(v for v in self.model.cache if self.model.cache[v].has(k))
         source = self.content_source(k)
-        #since in this simulation, we only have one source which is number 0,
-        # to simplify the configure, skip the checking
-        #if source:
-        loc.add(source)
+        if source:
+            loc.add(source)
         return loc
 
     def content_source(self, k):
@@ -375,6 +374,9 @@ class NetworkModel(object):
         cache_size = {}
         for node in topology.nodes_iter():
             stack_name, stack_props = fnss.get_stack(topology, node)
+            #print (node)
+            #print (stack_name)
+            #print (stack_props)
             #difference between our situation with normal configuration
             if stack_name == 'receiver':
                 if 'cache_size' in stack_props:
@@ -397,7 +399,6 @@ class NetworkModel(object):
         #key point!!!!!!!!!!!!!!!!!!!!!!!!!
         self.cache = {node: CACHE_POLICY[policy_name](cache_size[node], **policy_args)
                           for node in cache_size}
-
         # This is for a local un-coordinated cache (currently used only by
         # Hashrouting with edge cache)
         self.local_cache = {}
@@ -570,6 +571,26 @@ class NetworkController(object):
         """
         if node in self.model.cache:
             return self.model.cache[node].put(self.session['content'])
+   
+    
+    def broker_map(self,content, sharedSet):
+        """map shared content to the shared identifier
+        for searching among all shared copies.
+        Parameters
+        ----------
+        content : any hashable type
+            The content identifier requested by the receiver
+
+        sharedSet:
+            The set of shared contents
+        Returns
+        """
+        #TODO:log shared content hit
+        self.content = content
+        if self.content in sharedSet:
+            self.content = content % 100000 
+        return self.content
+
 
     def get_content(self, node):
         """Get a content from a server or a cache.

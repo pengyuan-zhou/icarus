@@ -192,6 +192,8 @@ def run_scenario(settings, params, curr_exp, n_exp):
         # Set topology
         topology_spec = tree['topology']
         topology_name = topology_spec.pop('name')
+        topology_asns = topology_spec.get('asns')
+
         if topology_name not in TOPOLOGY_FACTORY:
             logger.error('No topology factory implementation for %s was found.'
                          % topology_name)
@@ -203,7 +205,7 @@ def run_scenario(settings, params, curr_exp, n_exp):
             logger.error('No workload implementation named %s was found.'
                          % workload_name)
             return None
-        workload = WORKLOAD[workload_name](topology, **workload_spec)
+        workload = WORKLOAD[workload_name](topology, topology_asns, **workload_spec)
 
         # Assign caches to nodes
         if 'cache_placement' in tree:
@@ -230,7 +232,7 @@ def run_scenario(settings, params, curr_exp, n_exp):
             logger.error('No content placement implementation named %s was found.'
                          % contpl_name)
             return None
-        CONTENT_PLACEMENT[contpl_name](topology, workload.rank_sum, workload.contents, **contpl_spec)
+        CONTENT_PLACEMENT[contpl_name](topology, topology_asns, workload.rank_sum, workload.contents, **contpl_spec)
 
         # caching and routing strategy definition
         strategy = tree['strategy']

@@ -36,7 +36,7 @@ __all__ = [
 @register_workload('DIFFRANK')
 class DiffrankWorkload(object):
     #different rankings with same alpha
-    def __init__(self, topology, diff, rank_diff, n_contents, rank_sum, alpha, beta=0, rate=1.0, n_warmup=10**5, n_measured=4*10**5, seed=None, **kwargs):
+    def __init__(self, topology, asns, diff, rank_diff, n_contents, rank_sum, alpha, beta=0, rate=1.0, n_warmup=10**5, n_measured=4*10**5, seed=None, **kwargs):
         if alpha < 0:
             raise ValueError('alpha must be positive')
         if beta < 0:
@@ -45,7 +45,6 @@ class DiffrankWorkload(object):
         self.diff = diff
         self.topology = topology
         rank_choose = 0
-
         #request distributions are uniform distributed to users
         ranks = [i for i in range(rank_sum)]
         #uniform distribution of request patterns
@@ -83,6 +82,8 @@ class DiffrankWorkload(object):
             rank_receiver = self.topology.node[self.receiver]['rank']
             content = int(self.zipf.rv()) + self.n_contents * self.rank_diff * rank_receiver
             log = (req_counter >= self.n_warmup)
+            #print ("work")
+            #print (receiver,content)
             event = {'receiver': receiver, 'content': content, 'log': log}
             yield (t_event, event)
             req_counter += 1

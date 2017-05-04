@@ -807,13 +807,16 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
     # a greater degree value but we compute degree to decide where to attach sources
     
     routerslist = [topology.nodes() for topology in topologylist]
-    # Source attachment
-    n_sourceslist = [int(source_ratio * len(routers)) for routers in routerslist]
+    # Source attachment, only define 3 publishers for each AS (only for the ICN17 paper simulation)
+    #n_sourceslist = [int(source_ratio * len(routers)) for routers in routerslist]
+    numSource = 3 #number of source nodes each AS
+    n_sourceslist = [numSource for routers in routerslist]  #only for ICN17
     sourceslist = [None] * len(n_sourceslist) 
+    j = 0 #only for ICN17
     for n_sources in n_sourceslist:
-        j = n_sourceslist.index(n_sources)
-        sourceslist[j] =['src_%d_%d' % (j,i) for i in range(n_sources)]    
-    
+        #j = n_sourceslist.index(n_sources)
+        sourceslist[j] =['src_AS%d_%d' % (j,i) for i in range(n_sources)]    
+        j += 1  #only for ICN17
     deg = [nx.degree(topology) for topology in topologylist]
 
     # Attach sources based on their degree purely, but they may end up quite clustered
@@ -834,7 +837,7 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
     receiverslist = [None]*len(routerslistsort)
     for routers in routerslistsort:
         j = routerslistsort.index(routers)
-        receiverslist[j] = ['rec_%d_%d' % (j,i) for i in range(len(routers))]
+        receiverslist[j] = ['rec_AS%d_%d' % (j,i) for i in range(len(routers))]
         for i in range(len(routers)):
             topologylist[j].add_edge(receiverslist[j][i], routers[i], delay=0, type='internal')
     # Set weights to latency values
@@ -866,7 +869,6 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
             fnss.add_stack(topo_multiAS, v, 'receiver')
         for v in routerslistsort[j]:
             fnss.add_stack(topo_multiAS, v, 'router')
-        print (topo_multiAS.nodes()) 
     return IcnTopology(topo_multiAS)
 
 def mapping(x):
