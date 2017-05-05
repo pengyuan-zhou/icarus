@@ -57,6 +57,8 @@ STRATEGY_STYLE = {
          'RAND_CHOICE':     'r--<',
          'RAND_BERNOULLI':  'g--*',
          'NO_CACHE':        'k:o',
+         'NRR':             'r--v',
+         'BROKER_ASSISTED': 'g--s',
          'OPTIMAL':         'k-o'
                 }
 
@@ -74,6 +76,8 @@ STRATEGY_LEGEND = {
          'RAND_CHOICE':     'Random (choice)',
          'RAND_BERNOULLI':  'Random (Bernoulli)',
          'NO_CACHE':        'No caching',
+         'NRR':             'Ideal nearest replica',
+         'BROKER_ASSISTED': 'Broker assisted',
          'OPTIMAL':         'Optimal'
                     }
 
