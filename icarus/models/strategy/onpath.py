@@ -18,6 +18,7 @@ __all__ = [
        'CacheLessForMore',
        'RandomBernoulli',
        'RandomChoice',
+       'BrokerAssisted'
            ]
 
 
@@ -202,6 +203,72 @@ class LeaveCopyDown(Strategy):
         self.controller.end_session()
 
 
+
+
+
+@register_strategy('BROKER_ASSISTED')
+class BrokerAssisted(Strategy):
+
+    @inheritdoc(Strategy)
+    def __init__(self, view, controller, sharedSet, t_tw=10):
+        super(BrokerAssisted, self).__init__(view, controller)
+        self.t_tw = t_tw
+        self.cache_size = view.cache_nodes(size=True)
+        self.sharedset = sharedSet
+        self.distance = nx.all_pairs_dijkstra_path_length(self.view.topology(), weight='delay')
+
+    @inheritdoc(Strategy)
+    def process_event(self, time, receiver, content, log):
+        # get all required data
+        content, confirm = self.controller.broker_map(content, self.sharedset)
+        # incoming shared content request
+        if confirm == 1:
+            #search broker table
+            #print(self.view.broker_table(content))
+            locations = self.view.content_locations(content)
+            #print (locations)
+            nearest_replica = min(locations, key=lambda x: self.distance[receiver][x])
+            path = self.view.shortest_path(receiver, nearest_replica)
+            #print (nearest_replica)
+        else:
+            source = self.view.content_source(content)
+            path = self.view.shortest_path(receiver, source)
+        self.controller.start_session(time, receiver, content, log)
+        # Route requests to original source and queries caches on the path
+        for hop in range(1, len(path)):
+            u = path[hop - 1]
+            v = path[hop]
+            self.controller.forward_request_hop(u, v)
+            if self.view.has_cache(v):
+                if self.controller.get_content(v):
+                    serving_node = v
+                    break
+        else:
+            # No cache hits, get content from source
+            self.controller.get_content(v)
+            serving_node = v
+        # Return content
+        path = list(reversed(self.view.shortest_path(receiver, serving_node)))
+        c = len([v for v in path if self.view.has_cache(v)])
+        x = 0.0
+        for hop in range(1, len(path)):
+            u = path[hop - 1]
+            v = path[hop]
+            N = sum([self.cache_size[n] for n in path[hop - 1:]
+                     if n in self.cache_size])
+            if v in self.cache_size:
+                x += 1
+            self.controller.forward_content_hop(u, v)
+            if v != receiver and v in self.cache_size:
+                # The (x/c) factor raised to the power of "c" according to the
+                # extended version of ProbCache published in IEEE TPDS
+                prob_cache = float(N) / (self.t_tw * self.cache_size[v]) * (x / c) ** c
+                if random.random() < prob_cache:
+                    self.controller.put_content(v)
+        self.controller.end_session()
+
+
+
 @register_strategy('PROB_CACHE')
 class ProbCache(Strategy):
     """ProbCache strategy [3]_
@@ -227,7 +294,7 @@ class ProbCache(Strategy):
     """
 
     @inheritdoc(Strategy)
-    def __init__(self, view, controller, t_tw=10):
+    def __init__(self, view, controller, sharedSet, t_tw=10):
         super(ProbCache, self).__init__(view, controller)
         self.t_tw = t_tw
         self.cache_size = view.cache_nodes(size=True)
@@ -246,6 +313,7 @@ class ProbCache(Strategy):
             if self.view.has_cache(v):
                 if self.controller.get_content(v):
                     serving_node = v
+                    print (v)
                     break
         else:
             # No cache hits, get content from source

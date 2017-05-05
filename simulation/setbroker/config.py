@@ -51,25 +51,25 @@ DATA_COLLECTORS = ['CACHE_HIT_RATIO', 'LATENCY','LINK_LOAD' ]
 ALPHA = [1.0]
 
 # Total size of network cache as a fraction of content population
-NETWORK_CACHE = [0.01]#, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01, 0.05, 0.1]
+NETWORK_CACHE = [ 0.01]#, 0.05, 0.1, 0.15, 0.2, 0.25]#, 0.009, 0.01, 0.05, 0.1]
 
 DIFF = [0.2]
 
 # Number of content objects
-N_CONTENTS = 3*10**5
-SHAREDSET = range(1,10001) 
-SHAREDSET.extend(range(100001,110001))
-SHAREDSET.extend(range(200001,210001))
+N_CONTENTS = 1*10**6
+SHAREDSET = range(1,1001) 
+SHAREDSET.extend(range(1000001,1001001))
+SHAREDSET.extend(range(2000001,2001001))
 # Number of requests per second (over the whole network)
 NETWORK_REQUEST_RATE = 50.0
 
 # Number of content requests generated to prepopulate the caches
 # These requests are not logged
-N_WARMUP_REQUESTS = 3*10**5
+N_WARMUP_REQUESTS = 3*10**6
 
 # Number of content requests generated after the warmup and logged
 # to generate results.
-N_MEASURED_REQUESTS = 6*10**5
+N_MEASURED_REQUESTS = 6*10**6
 
 # List of all implemented topologies
 # Topology implementations are located in ./icarus/scenarios/topology.py
@@ -95,16 +95,18 @@ ASNS = [
 # List of caching and routing strategies
 # The code is located in ./icarus/models/strategy.py
 STRATEGIES = [
-              'NRR'
-              #'EDGE'
+              #'NRR',
+              #'EDGE',
               #'HR_SYMM',         # Symmetric hash-routing
               #'HR_ASYMM',        # Asymmetric hash-routing
               #'HR_MULTICAST',    # Multicast hash-routing
               #'HR_HYBRID_AM',    # Hybrid Asymm-Multicast hash-routing
               #'HR_HYBRID_SM',    # Hybrid Symm-Multicast hash-routing
               #'CL4M',            # Cache less for more
-              #'PROB_CACHE',      # ProbCache
+              'PROB_CACHE',      # ProbCache
               #'LCD',             # Leave Copy Down
+              #'LCE',
+              'BROKER_ASSISTED'
               #'RAND_CHOICE',     # Random choice: cache in one random cache on path
               #'RAND_BERNOULLI'  # Random Bernoulli: cache randomly in caches on path
               ]
@@ -125,7 +127,7 @@ WORKLOADS = [
 # Cache policy implmentations are located in ./icarus/models/cache.py
 CACHE_POLICY = 'LRU'
 
-RANK_SUM = [ 1]
+RANK_SUM = [3]
 RANK_DIFF = [1]
 
 # Queue of experiments
@@ -151,7 +153,7 @@ default['workload'] = {
                         'n_measured': N_MEASURED_REQUESTS,
                         'rate':       NETWORK_REQUEST_RATE
                         }
-default['cache_placement']['name'] = 'UNIFORM'
+default['cache_placement']['name'] = 'DEGREE'
 #decide the size of cache in each icr_candidate
 default['content_placement']['name'] = 'UNIFORM'
 #decide the content in each source
@@ -177,7 +179,7 @@ for rank_sum in RANK_SUM:
                                     experiment['workload']['diff'] = diff
                                     experiment['workload']['alpha'] = alpha
                                     experiment['strategy']['name'] = strategy
-                                    experiment['strategy']['metacaching'] = 'LCE'
+                                    #experiment['strategy']['metacaching'] = 'LCE'
                                     experiment['strategy']['sharedSet'] = SHAREDSET
                                     experiment['cache_placement']['network_cache'] = network_cache
                                     experiment['desc'] = "topology: %s, strategy: %s, diff: %s, Alpha: %s, rank_sum: %s, workload :%s, rank_diff: %s,  network cache: %s" \

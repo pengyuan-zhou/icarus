@@ -79,6 +79,7 @@ class Orchestrator(object):
                       else 1
         logger.info('Starting simulations: %d experiments, %d process(es)'
                     % (self.n_exp, self.n_proc))
+        print ("here1")
 
         if self.settings.PARALLEL_EXECUTION:
             # This job queue is used only to keep track of which jobs have

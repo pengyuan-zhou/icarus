@@ -82,8 +82,6 @@ class DiffrankWorkload(object):
             rank_receiver = self.topology.node[self.receiver]['rank']
             content = int(self.zipf.rv()) + self.n_contents * self.rank_diff * rank_receiver
             log = (req_counter >= self.n_warmup)
-            #print ("work")
-            #print (receiver,content)
             event = {'receiver': receiver, 'content': content, 'log': log}
             yield (t_event, event)
             req_counter += 1

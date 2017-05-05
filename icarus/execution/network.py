@@ -132,6 +132,10 @@ class NetworkView(object):
         """
         return self.model.shortest_path[s][t]
 
+    def broker_table(self, receiver, content):
+
+        return self.model.broker_table[receiver,content]
+
     def all_pairs_shortest_paths(self):
         """Return all pairs shortest paths
 
@@ -374,11 +378,7 @@ class NetworkModel(object):
         cache_size = {}
         for node in topology.nodes_iter():
             stack_name, stack_props = fnss.get_stack(topology, node)
-            #print (node)
-            #print (stack_name)
-            #print (stack_props)
-            #difference between our situation with normal configuration
-            if stack_name == 'receiver':
+            if stack_name == 'router':
                 if 'cache_size' in stack_props:
                     cache_size[node] = stack_props['cache_size']
             elif stack_name == 'source':
@@ -402,6 +402,31 @@ class NetworkModel(object):
         # This is for a local un-coordinated cache (currently used only by
         # Hashrouting with edge cache)
         self.local_cache = {}
+        
+        #Broker table------------------------------
+        self.broker_table = {}
+        sharedSet = range(1,1001)
+        sharedSet.extend(range(1000001,1001001))
+        sharedSet.extend(range(2000001,2001001))
+        i=0
+        loc = set()
+        for k in sharedSet[0:1000]:
+            while i<3:
+                k += i*10**6
+                loc = loc.union(set(v for v in self.cache if self.cache[v].has(k)))
+                source = self.content_source.get(k, None)
+                if source:
+                    loc.add(source)
+                for node in topology.nodes_iter():
+                    stack_name, stack_props = fnss.get_stack(topology, node)
+                    if stack_name == 'receiver':
+                    nearest_replica1 = min(loc, key=lambda x: self.distance[node][k])
+            self.broker_table[k] = loc
+        print ("whole table")
+        #print (self.broker_table)
+        
+        
+        #Broker table------------------------------
 
         # Keep track of nodes and links removed to simulate failures
         self.removed_nodes = {}
@@ -587,9 +612,11 @@ class NetworkController(object):
         """
         #TODO:log shared content hit
         self.content = content
+        self.confirm = 0
         if self.content in sharedSet:
-            self.content = content % 100000 
-        return self.content
+            self.content = content % 1000000
+            self.confirm = 1
+        return self.content, self.confirm
 
 
     def get_content(self, node):

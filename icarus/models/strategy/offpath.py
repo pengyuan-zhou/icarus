@@ -62,9 +62,10 @@ class NearestReplicaRouting(Strategy):
     def process_event(self, time, receiver, content, log):
         # get all required data
         #map content to sharedID if it's a sharedcontent
-        #content = self.controller.broker_map(content, self.sharedset)
+        content = self.controller.broker_map(content, self.sharedset)
         locations = self.view.content_locations(content)
         nearest_replica = min(locations, key=lambda x: self.distance[receiver][x])
+        #print (nearest_replica)
         #print (locations)
         # Route request to nearest replica
         self.controller.start_session(time, receiver, content, log)
@@ -90,6 +91,8 @@ class NearestReplicaRouting(Strategy):
         if self.metacaching == 'LCE':
             for u, v in path_links(path):
                 self.controller.forward_content_hop(u, v)
+                #print (v)
+                #print (self.view.has_cache(v))
                 if self.view.has_cache(v) and not self.view.cache_lookup(v, content):
                     self.controller.put_content(v)
         elif self.metacaching == 'LCD':

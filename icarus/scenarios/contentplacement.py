@@ -23,7 +23,6 @@ def apply_content_placement(placement, topology):
     topology : Topology
         The topology
     """
-    i=0
     for v, contents in placement.items():
         topology.node[v]['stack'][1]['contents'] = contents
 def get_sources(topology):

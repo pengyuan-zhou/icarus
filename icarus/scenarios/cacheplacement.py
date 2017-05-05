@@ -35,9 +35,9 @@ def uniform_cache_placement(topology, cache_budget, **kwargs):
     cache_budget : int
         The cumulative cache budget
     """
-    print (topology.cache_nodes())
     icr_candidates = topology.graph['icr_candidates']
     cache_size = iround(cache_budget / len(icr_candidates))
+    print ("cache size of each node is %d" % cache_size)
     for v in icr_candidates:
         topology.node[v]['stack'][1]['cache_size'] = cache_size
 @register_cache_placement('DEGREE')

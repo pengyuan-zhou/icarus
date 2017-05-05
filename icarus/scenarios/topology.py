@@ -12,7 +12,6 @@ A valid ICN topology must have the following attributes:
    cache placement algorithm.
 """
 from __future__ import division
-
 from os import path
 
 import networkx as nx
@@ -818,25 +817,27 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
         sourceslist[j] =['src_AS%d_%d' % (j,i) for i in range(n_sources)]    
         j += 1  #only for ICN17
     deg = [nx.degree(topology) for topology in topologylist]
-
     # Attach sources based on their degree purely, but they may end up quite clustered
-    routerslistsort = [ sorted(routers, key=lambda k: deg[routerslist.index(routers)][k], reverse=True) for routers in routerslist ]
+    #routerslistsort = [ sorted(routers, key=lambda k: deg[routerslist.index(routers)][k], reverse=True) for routers in routerslist ]
+    for routers in routerslist:
+        j=routerslist.index(routers)
+        routers = sorted(routers, key=lambda k: deg[j][k], reverse=True)
     for sources in sourceslist:
         j = sourceslist.index(sources)
         for i in range(len(sources)):
             #intra AS link set as internal, source to router delay bigger than router to receiver
-            topologylist[j].add_edge(sources[i], routerslistsort[j][i], delay=1, type='internal')
+            topologylist[j].add_edge(sources[i], routerslist[j][i], delay=1, type='internal')
             #inter AS link set as external, AS_i source connect to AS_i+1(cycle of list)  router
             if j==(len(sourceslist)-1):
-                topologylist[j].add_edge(sources[i], routerslistsort[0][i], delay=ext_delay, type='external')
+                topologylist[j].add_edge(sources[i], routerslist[0][i], delay=ext_delay, type='external')
             else:            
-                topologylist[j].add_edge(sources[i], routerslistsort[j+1][i], delay=ext_delay, type='external')
-  
+                topologylist[j].add_edge(sources[i], routerslist[j+1][i], delay=ext_delay, type='external')
+ 
 
     # attach artificial receiver nodes to ICR candidates
-    receiverslist = [None]*len(routerslistsort)
-    for routers in routerslistsort:
-        j = routerslistsort.index(routers)
+    receiverslist = [None]*len(routerslist)
+    for routers in routerslist:
+        j = routerslist.index(routers)
         receiverslist[j] = ['rec_AS%d_%d' % (j,i) for i in range(len(routers))]
         for i in range(len(routers)):
             topologylist[j].add_edge(receiverslist[j][i], routers[i], delay=0, type='internal')
@@ -848,27 +849,38 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
     #multiple AS topology
     #we combine and import all the node,edge and attributes after individual definition of each AS
     #to provide scalability that being easier to change any one of them
-    topo_multiAS = nx.Graph()
-    for topology in topologylist:
-        j = topologylist.index(topology)    
+    routerall = set()
+    for routers in routerslist:
+        routerall=routerall.union(routers)
+    sourceall = set()
+    for sources in sourceslist:
+        sourceall=sourceall.union(sources)
+    receiverall = set()
+    for receivers in receiverslist:
+        receiverall=receiverall.union(receivers)
+    topo_multiAS = topologylist[0]
+    #combine nodes and edges into multi AS topo
+    for topology in topologylist[1:]:
         for v in topology.nodes():
             topo_multiAS.add_node(v)
         topo_multiAS.add_edges_from(topology.edges())
+    #set attribute
+    topo_multiAS.graph['icr_candidates']=set(routerall) 
+    for topology in topologylist:    
+        j = topologylist.index(topology)    
         delays = nx.get_edge_attributes(topology, 'delay')
         types = nx.get_edge_attributes(topology, 'type')
         weights = nx.get_edge_attributes(topology, 'weight')
         nx.set_edge_attributes(topo_multiAS,'delay',delays)
         nx.set_edge_attributes(topo_multiAS,'type',types)
         nx.set_edge_attributes(topo_multiAS,'weight',weights)
-        
-        # Deploy stacks on nodes
-        topo_multiAS.graph['icr_candidates'] = set(routerslistsort[j])
-        for v in sourceslist[j]:
-            fnss.add_stack(topo_multiAS, v, 'source')
-        for v in receiverslist[j]:
-            fnss.add_stack(topo_multiAS, v, 'receiver')
-        for v in routerslistsort[j]:
-            fnss.add_stack(topo_multiAS, v, 'router')
+    # Deploy stacks on nodes
+    for v in sourceall:
+        fnss.add_stack(topo_multiAS, v, 'source')
+    for v in receiverall:
+        fnss.add_stack(topo_multiAS, v, 'receiver')
+    for v in routerall:
+        fnss.add_stack(topo_multiAS, v, 'router')
     return IcnTopology(topo_multiAS)
 
 def mapping(x):
