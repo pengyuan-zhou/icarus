@@ -881,6 +881,14 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
         fnss.add_stack(topo_multiAS, v, 'receiver')
     for v in routerall:
         fnss.add_stack(topo_multiAS, v, 'router')
+    for u, v in topo_multiAS.edges():
+        if u in sources or v in sources:
+            topo_multiAS.edge[u][v]['type'] = 'external'
+            # this prevents sources to be used to route traffic
+            fnss.set_weights_constant(topo_multiAS, 1000.0, [(u, v)])
+            fnss.set_delays_constant(topo_multiAS, EXTERNAL_LINK_DELAY, 'ms', [(u, v)])
+        else:
+            topo_multiAS.edge[u][v]['type'] = 'internal'
     return IcnTopology(topo_multiAS)
 
 def mapping(x):
