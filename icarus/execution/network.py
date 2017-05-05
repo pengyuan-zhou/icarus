@@ -554,7 +554,7 @@ class NetworkController(object):
         #in fact, this should be have to hit, otherwise it's error
         if node in self.model.cache:
             for c in replica:
-                cache_hit + = self.model.cache[node].get(c)
+                cache_hit += self.model.cache[node].get(c)
                 if cache_hit:
                     #the one to retreive
                     selectedr = c
