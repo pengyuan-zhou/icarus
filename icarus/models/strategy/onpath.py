@@ -207,11 +207,10 @@ class LeaveCopyDown(Strategy):
 class BrokerAssisted(Strategy):
 
     @inheritdoc(Strategy)
-    def __init__(self, view, controller, sharedSet, t_tw=10):
+    def __init__(self, view, controller,  t_tw=10):
         super(BrokerAssisted, self).__init__(view, controller)
         self.t_tw = t_tw
         self.cache_size = view.cache_nodes(size=True)
-        self.sharedset = sharedSet
         self.distance = nx.all_pairs_dijkstra_path_length(self.view.topology(), weight='delay')
 
     @inheritdoc(Strategy)

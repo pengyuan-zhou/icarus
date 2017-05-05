@@ -20,6 +20,7 @@ import fnss
 from icarus.registry import CACHE_POLICY
 from icarus.util import path_links, iround
 from icarus.dumb import sharedSet as ss
+from icarus.dumb import contentIDgap as gap
 
 __all__ = [
     'NetworkModel',
@@ -84,7 +85,7 @@ class NetworkView(object):
         i=0
         loc = set()
         while i<3:
-            k += i*10**6
+            k += i * gap
             loc = loc.union(set(v for v in self.model.cache if self.cache[v].has(k)))
             source = self.content_source(k)
             if source:
@@ -149,9 +150,6 @@ class NetworkView(object):
         """
         return self.model.shortest_path[s][t]
 
-    def broker_table(self, receiver, content):
-
-        return self.model.broker_table[receiver,content]
 
     def all_pairs_shortest_paths(self):
         """Return all pairs shortest paths
@@ -507,7 +505,7 @@ class NetworkController(object):
         self.content = content
         self.confirm = 0
         if self.content in ss:
-            self.content = content % 1000000
+            self.content = content % gap
             self.confirm = 1
         return self.content, self.confirm
 

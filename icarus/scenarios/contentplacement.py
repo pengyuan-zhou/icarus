@@ -58,6 +58,7 @@ def uniform_content_placement(topology, asns, rank_sum, contents, seed=None):
     numSource = len(source_nodes)/len(asns) #the number of source nodes in each AS ## only for when signing eaualing number of nodes 
     #we divide content by source nodes in each AS
     size = int(len(contents)/numSource) #source in diff ASes have same contents,which doesn't influence since we block inter AS transfer by defining largeinter AS delay
+    print ("each source node have %d content" % size)
     source_nodes = sorted(source_nodes)
     #we define different zize of publishers(number of connected ASes)
     #through combining source nodes, i.e., if let src_AS0_0 store the
