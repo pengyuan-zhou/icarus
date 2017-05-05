@@ -51,7 +51,7 @@ DATA_COLLECTORS = ['CACHE_HIT_RATIO', 'LATENCY','LINK_LOAD' ]
 ALPHA = [1.0]
 
 # Total size of network cache as a fraction of content population
-NETWORK_CACHE = [ 0.01]#, 0.05, 0.1, 0.15, 0.2, 0.25]#, 0.009, 0.01, 0.05, 0.1]
+NETWORK_CACHE = [ 0.01, 0.05, 0.1, 0.15, 0.2, 0.25]#, 0.009, 0.01, 0.05, 0.1]
 
 DIFF = [0.2]
 

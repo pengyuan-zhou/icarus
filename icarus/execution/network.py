@@ -86,7 +86,7 @@ class NetworkView(object):
         loc = set()
         while i<3:
             k += i * gap
-            loc = loc.union(set(v for v in self.model.cache if self.cache[v].has(k)))
+            loc = loc.union(set(v for v in self.model.cache if self.model.cache[v].has(k)))
             source = self.content_source(k)
             if source:
                 loc.add(source)
