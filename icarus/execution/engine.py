@@ -8,7 +8,6 @@ and providing them to a strategy instance.
 from icarus.execution import NetworkModel, NetworkView, NetworkController, CollectorProxy
 from icarus.registry import DATA_COLLECTOR, STRATEGY
 
-
 __all__ = ['exec_experiment']
 
 

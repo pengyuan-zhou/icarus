@@ -289,25 +289,6 @@ def plot_link_load_vs_topology(resultset, alpha, cache_size, topology_range, str
 
 
 
-def plot_cache_hits_vs_group_size(resultset, topology, cache_size, group_size_range, ranks, plotdir):
-    desc = {}
-    desc['title'] = 'Cache hit ratio vs Group size: T=%s C=%s' % (topology, cache_size)
-    desc['ylabel'] = 'Cache hit ratio'
-    desc['xlabel'] = 'Group size'
-    desc['xparam'] = ('topology', 'n_member')
-    desc['xvals'] = group_size_range
-    desc['filter'] = {'topology': {'name': topology},
-                      'cache_placement': {'network_cache': cache_size}}
-    desc['ymetrics'] = [('CACHE_HIT_RATIO', 'MEAN')]*len(ranks)
-    desc['ycondnames'] = [('workload', 'n_rank')]*len(ranks)
-    desc['ycondvals'] = ranks
-    desc['errorbar'] = True
-    desc['legend_loc'] = 'upper right'
-    desc['line_style'] = RANK_STYLE
-    desc['legend'] = RANK_LEGEND
-    desc['plotempty'] = PLOT_EMPTY_GRAPHS
-    plot_lines(resultset, desc, 'CACHE_HIT_RATIO_VS_GROUP_SIZET=%s@C=%s.pdf'
-               % (topology, cache_size), plotdir)
 
     
 

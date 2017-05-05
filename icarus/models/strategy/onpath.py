@@ -203,9 +203,6 @@ class LeaveCopyDown(Strategy):
         self.controller.end_session()
 
 
-
-
-
 @register_strategy('BROKER_ASSISTED')
 class BrokerAssisted(Strategy):
 
@@ -220,19 +217,18 @@ class BrokerAssisted(Strategy):
     @inheritdoc(Strategy)
     def process_event(self, time, receiver, content, log):
         # get all required data
-        content, confirm = self.controller.broker_map(content, self.sharedset)
+        content, confirm = self.controller.broker_map(content)
         # incoming shared content request
         if confirm == 1:
             #search broker table
-            #print(self.view.broker_table(content))
-            locations = self.view.content_locations(content)
-            #print (locations)
-            nearest_replica = min(locations, key=lambda x: self.distance[receiver][x])
+            replicas = self.view.broker_lookup(content)
+            nearest_replica = min(replicas, key=lambda x: self.distance[receiver][x]) 
             path = self.view.shortest_path(receiver, nearest_replica)
-            #print (nearest_replica)
+            print ("nearest_replica",nearest_replica)
         else:
             source = self.view.content_source(content)
             path = self.view.shortest_path(receiver, source)
+
         self.controller.start_session(time, receiver, content, log)
         # Route requests to original source and queries caches on the path
         for hop in range(1, len(path)):
@@ -294,7 +290,7 @@ class ProbCache(Strategy):
     """
 
     @inheritdoc(Strategy)
-    def __init__(self, view, controller, sharedSet, t_tw=10):
+    def __init__(self, view, controller, t_tw=10):
         super(ProbCache, self).__init__(view, controller)
         self.t_tw = t_tw
         self.cache_size = view.cache_nodes(size=True)
@@ -313,7 +309,6 @@ class ProbCache(Strategy):
             if self.view.has_cache(v):
                 if self.controller.get_content(v):
                     serving_node = v
-                    print (v)
                     break
         else:
             # No cache hits, get content from source

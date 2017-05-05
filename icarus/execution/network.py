@@ -19,6 +19,7 @@ import fnss
 
 from icarus.registry import CACHE_POLICY
 from icarus.util import path_links, iround
+from icarus.dumb import sharedSet as ss
 
 __all__ = [
     'NetworkModel',
@@ -75,6 +76,22 @@ class NetworkView(object):
             raise ValueError('The model argument must be an instance of '
                              'NetworkModel')
         self.model = model
+        
+    #Broker table------------------------------
+    def broker_lookup(self, k):
+        """return locations of all mapped shared content
+        s"""
+        i=0
+        loc = set()
+        while i<3:
+            k += i*10**6
+            loc = loc.union(set(v for v in self.model.cache if self.cache[v].has(k)))
+            source = self.content_source(k)
+            if source:
+                loc.add(source)
+            i += 1
+        return loc 
+        #Broker table------------------------------
 
     def content_locations(self, k):
         """Return a set of all current locations of a specific content.
@@ -403,30 +420,6 @@ class NetworkModel(object):
         # Hashrouting with edge cache)
         self.local_cache = {}
         
-        #Broker table------------------------------
-        self.broker_table = {}
-        sharedSet = range(1,1001)
-        sharedSet.extend(range(1000001,1001001))
-        sharedSet.extend(range(2000001,2001001))
-        i=0
-        loc = set()
-        for k in sharedSet[0:1000]:
-            while i<3:
-                k += i*10**6
-                loc = loc.union(set(v for v in self.cache if self.cache[v].has(k)))
-                source = self.content_source.get(k, None)
-                if source:
-                    loc.add(source)
-                for node in topology.nodes_iter():
-                    stack_name, stack_props = fnss.get_stack(topology, node)
-                    if stack_name == 'receiver':
-                    nearest_replica1 = min(loc, key=lambda x: self.distance[node][k])
-            self.broker_table[k] = loc
-        print ("whole table")
-        #print (self.broker_table)
-        
-        
-        #Broker table------------------------------
 
         # Keep track of nodes and links removed to simulate failures
         self.removed_nodes = {}
@@ -497,6 +490,26 @@ class NetworkController(object):
                             log=log)
         if self.collector is not None and self.session['log']:
             self.collector.start_session(timestamp, receiver, content)
+    
+    def broker_map(self,content):
+        """map shared content to the shared identifier
+        for searching among all shared copies.
+        Parameters
+        ----------
+        content : any hashable type
+            The content identifier requested by the receiver
+
+        sharedSet:
+            The set of shared contents
+        Returns
+        """
+        #TODO:log shared content hit
+        self.content = content
+        self.confirm = 0
+        if self.content in ss:
+            self.content = content % 1000000
+            self.confirm = 1
+        return self.content, self.confirm
 
     def forward_request_path(self, s, t, path=None, main_path=True):
         """Forward a request from node *s* to node *t* over the provided path.
@@ -596,28 +609,6 @@ class NetworkController(object):
         """
         if node in self.model.cache:
             return self.model.cache[node].put(self.session['content'])
-   
-    
-    def broker_map(self,content, sharedSet):
-        """map shared content to the shared identifier
-        for searching among all shared copies.
-        Parameters
-        ----------
-        content : any hashable type
-            The content identifier requested by the receiver
-
-        sharedSet:
-            The set of shared contents
-        Returns
-        """
-        #TODO:log shared content hit
-        self.content = content
-        self.confirm = 0
-        if self.content in sharedSet:
-            self.content = content % 1000000
-            self.confirm = 1
-        return self.content, self.confirm
-
 
     def get_content(self, node):
         """Get a content from a server or a cache.

@@ -57,9 +57,6 @@ DIFF = [0.2]
 
 # Number of content objects
 N_CONTENTS = 1*10**6
-SHAREDSET = range(1,1001) 
-SHAREDSET.extend(range(1000001,1001001))
-SHAREDSET.extend(range(2000001,2001001))
 # Number of requests per second (over the whole network)
 NETWORK_REQUEST_RATE = 50.0
 
@@ -95,7 +92,7 @@ ASNS = [
 # List of caching and routing strategies
 # The code is located in ./icarus/models/strategy.py
 STRATEGIES = [
-              #'NRR',
+              'NRR',
               #'EDGE',
               #'HR_SYMM',         # Symmetric hash-routing
               #'HR_ASYMM',        # Asymmetric hash-routing
@@ -180,8 +177,8 @@ for rank_sum in RANK_SUM:
                                     experiment['workload']['alpha'] = alpha
                                     experiment['strategy']['name'] = strategy
                                     #experiment['strategy']['metacaching'] = 'LCE'
-                                    experiment['strategy']['sharedSet'] = SHAREDSET
+                                    #experiment['strategy']['sharedSet'] = SHAREDSET
                                     experiment['cache_placement']['network_cache'] = network_cache
                                     experiment['desc'] = "topology: %s, strategy: %s, diff: %s, Alpha: %s, rank_sum: %s, workload :%s, rank_diff: %s,  network cache: %s" \
-                            % (topology, strategy, str(diff), str(alpha), str(rank_sum), workload, str(rank_diff), str(network_cache))
-            EXPERIMENT_QUEUE.append(experiment)
+                                                            % (topology, strategy, str(diff), str(alpha), str(rank_sum), workload, str(rank_diff), str(network_cache))
+                                    EXPERIMENT_QUEUE.append(experiment)
