@@ -1,6 +1,8 @@
 SHAREDSET = range(1,1001)
-SHAREDSET.extend(range(1000001,1001001))
-SHAREDSET.extend(range(2000001,2001001))
+SHAREDSET.extend(range(100001,101001))
+SHAREDSET.extend(range(200001,201001))
 sharedSet = SHAREDSET
-
-contentIDgap = 10**6
+#content ID gap between replicas
+contentIDgap = 10**5
+#number of replicas for each shared content
+numre = 3

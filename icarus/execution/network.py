@@ -21,6 +21,7 @@ from icarus.registry import CACHE_POLICY
 from icarus.util import path_links, iround
 from icarus.dumb import sharedSet as ss
 from icarus.dumb import contentIDgap as gap
+from icarus.dumb import numre as nr
 
 __all__ = [
     'NetworkModel',
@@ -508,6 +509,69 @@ class NetworkController(object):
             self.content = content % gap
             self.confirm = 1
         return self.content, self.confirm
+    
+    def broker_put_replica(self, node, replica):
+        """Store content in the specified node.
+
+        The node must have a cache stack and the actual insertion of the
+        content is executed according to the caching policy. If the caching
+        policy has a selective insertion policy, then content may not be
+        inserted.
+
+        Parameters
+        ----------
+        node : any hashable type
+            The node where the content is inserted
+
+        Returns
+        -------
+        evicted : any hashable type
+            The evicted object or *None* if no contents were evicted.
+        """
+        if node in self.model.cache:
+            return self.model.cache[node].put(replica)
+
+    def broker_get_replica(self, node):
+        """Get a shared content from a server or a cache.
+
+        Parameters
+        ----------
+        node : any hashable type
+            The node where the content is retrieved
+
+        Returns
+        -------
+        content : bool
+            True if the content is available, False otherwise
+        """
+        if self.session['content'] not in range(1,1001):
+            return False
+        selectedr = self.session['content']
+        i = 0
+        while i< nr:
+            replica[i] = self.session['content'] + i*gap 
+            i+=1
+        #in fact, this should be have to hit, otherwise it's error
+        if node in self.model.cache:
+            for c in replica:
+                cache_hit + = self.model.cache[node].get(c)
+                if cache_hit:
+                    #the one to retreive
+                    selectedr = c
+            if cache_hit > 0:
+                if self.session['log']:
+                    self.collector.cache_hit(node)
+            else:
+                if self.session['log']:
+                    self.collector.cache_miss(node)
+            return selectedr
+        name, props = fnss.get_stack(self.model.topology, node)
+        if name == 'source' and selectedr in props['contents']:
+            if self.collector is not None and self.session['log']:
+                self.collector.server_hit(node)
+            return selectedr
+        else:
+            return False
 
     def forward_request_path(self, s, t, path=None, main_path=True):
         """Forward a request from node *s* to node *t* over the provided path.
@@ -607,6 +671,7 @@ class NetworkController(object):
         """
         if node in self.model.cache:
             return self.model.cache[node].put(self.session['content'])
+    
 
     def get_content(self, node):
         """Get a content from a server or a cache.
