@@ -547,6 +547,7 @@ class NetworkController(object):
         if self.session['content'] not in range(1,1001):
             return False
         selectedr = self.session['content']
+        replica = [None] * nr
         i = 0
         while i< nr:
             replica[i] = self.session['content'] + i*gap 
