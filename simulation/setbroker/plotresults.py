@@ -133,7 +133,7 @@ def plot_cache_hits_vs_cache_size(resultset, topology, alpha, cache_size_range, 
     desc['xparam'] = ('cache_placement','network_cache')
     desc['xvals'] = cache_size_range
     desc['filter'] = {'topology': {'name': topology},
-                      'workload': {'name': 'STATIONARY', 'alpha': alpha}}
+                      'workload': {'name': 'DIFFRANK', 'alpha': alpha}}
     desc['ymetrics'] = [('CACHE_HIT_RATIO', 'MEAN')]*len(strategies)
     desc['ycondnames'] = [('strategy', 'name')]*len(strategies)
     desc['ycondvals'] = strategies
@@ -176,7 +176,7 @@ def plot_link_load_vs_cache_size(resultset, topology, alpha, cache_size_range, s
     desc['xparam'] = ('cache_placement','network_cache')
     desc['xvals'] = cache_size_range
     desc['filter'] = {'topology': {'name': topology},
-                      'workload': {'name': 'stationary', 'alpha': alpha}}
+                      'workload': {'name': 'DIFFRANK', 'alpha': alpha}}
     desc['ymetrics'] = [('LINK_LOAD', 'MEAN_INTERNAL')]*len(strategies)
     desc['ycondnames'] = [('strategy', 'name')]*len(strategies)
     desc['ycondvals'] = strategies
@@ -219,7 +219,7 @@ def plot_latency_vs_cache_size(resultset, topology, alpha, cache_size_range, str
     desc['xparam'] = ('cache_placement','network_cache')
     desc['xvals'] = cache_size_range
     desc['filter'] = {'topology': {'name': topology},
-                      'workload': {'name': 'STATIONARY', 'alpha': alpha}}
+                      'workload': {'name': 'DIFFRANK', 'alpha': alpha}}
     desc['ymetrics'] = [('LATENCY', 'MEAN')]*len(strategies)
     desc['ycondnames'] = [('strategy', 'name')]*len(strategies)
     desc['ycondvals'] = strategies
@@ -249,7 +249,7 @@ def plot_cache_hits_vs_topology(resultset, alpha, cache_size, topology_range, st
     desc['xparam'] = ('topology', 'name')
     desc['xvals'] = topology_range
     desc['filter'] = {'cache_placement': {'network_cache': cache_size},
-                      'workload': {'name': 'STATIONARY', 'alpha': alpha}}
+                      'workload': {'name': 'DIFFRANK', 'alpha': alpha}}
     desc['ymetrics'] = [('CACHE_HIT_RATIO', 'MEAN')]*len(strategies)
     desc['ycondnames'] = [('strategy', 'name')]*len(strategies)
     desc['ycondvals'] = strategies
@@ -277,7 +277,7 @@ def plot_link_load_vs_topology(resultset, alpha, cache_size, topology_range, str
     desc['xparam'] = ('topology', 'name')
     desc['xvals'] = topology_range
     desc['filter'] = {'cache_placement': {'network_cache': cache_size},
-                      'workload': {'name': 'STATIONARY', 'alpha': alpha}}
+                      'workload': {'name': 'DIFFRANK', 'alpha': alpha}}
     desc['ymetrics'] = [('LINK_LOAD', 'MEAN_INTERNAL')]*len(strategies)
     desc['ycondnames'] = [('strategy', 'name')]*len(strategies)
     desc['ycondvals'] = strategies

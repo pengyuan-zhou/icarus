@@ -48,10 +48,10 @@ DATA_COLLECTORS = ['CACHE_HIT_RATIO', 'LATENCY', 'LINK_LOAD', 'PATH_STRETCH']
 # This would give problems while trying to plot the results because if for
 # example I wanted to filter experiment with alpha=0.8, experiments with
 # alpha = 0.799999999999 would not be recognized 
-ALPHA = [0.6, 0.8]#, 1.0, 1.2]
+ALPHA = [0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2]#, 1.0, 1.2]
 
 # Total size of network cache as a fraction of content population
-NETWORK_CACHE = [0.004, 0.002]#, 0.01, 0.05]
+NETWORK_CACHE = [0.001]#, 0.005, 0.01,0.015,0.02,0.025,0.03,0.035,0.04]
 
 # Number of content objects
 N_CONTENTS = 1*10**5
@@ -77,22 +77,22 @@ TOPOLOGIES =  [
          'MULTIAS'
               ]
 
-ASNS = [1239,3257,6461]
+ASNS = [1221,1755,3967]
 
 # List of caching and routing strategies
 # The code is located in ./icarus/models/strategy.py
 STRATEGIES = [
-     #'LCE',             # Leave Copy Everywhere
+     'LCE',             # Leave Copy Everywhere
      #'NO_CACHE',        # No caching, shorest-path routing
-     #'HR_SYMM',         # Symmetric hash-routing
-     #'HR_ASYMM',        # Asymmetric hash-routing
+     'HR_SYMM',         # Symmetric hash-routing
+     'HR_ASYMM',        # Asymmetric hash-routing
      #'HR_MULTICAST',    # Multicast hash-routing
      #'HR_HYBRID_AM',    # Hybrid Asymm-Multicast hash-routing
      #'HR_HYBRID_SM',    # Hybrid Symm-Multicast hash-routing
-     #'CL4M',            # Cache less for more
+     'CL4M',            # Cache less for more
      'PROB_CACHE',      # ProbCache
      'LCD',             # Leave Copy Down
-     #'RAND_CHOICE',     # Random choice: cache in one random cache on path
+     'NRR',     # Random choice: cache in one random cache on path
      #'RAND_BERNOULLI',  # Random Bernoulli: cache randomly in caches on path
      'BROKER_ASSISTED'
              ]
