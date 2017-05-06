@@ -23,7 +23,7 @@ CONFIG_FILE=${CURR_DIR}/config.py
 
 # FIle where results will be saved
 #RESULTS_FILE=${CURR_DIR}/results.$current_time.pickle
-RESULTS_FILE=${CURR_DIR}/results.2017.05.06-15.09.19.pickle
+RESULTS_FILE=${CURR_DIR}/results.2017.05.06-18.25.24.pickle
 #touch $RESULTS_FILE
 
 # Add Icarus code to PYTHONPATH

@@ -1,6 +1,16 @@
 For ICN simulation.
 
 
+result:
+plots.2017.05.06-15.09.19   : c=0.001, alpha changes, 
+plots.2017.05.06-17.22.05   : alpha=1.0, c changes
+
+
+
+
+
+
+
 ## Run
 To run the expriments and plot the results, execute the `run.sh` script:
 

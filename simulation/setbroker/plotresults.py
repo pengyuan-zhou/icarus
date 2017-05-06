@@ -58,7 +58,7 @@ STRATEGY_STYLE = {
          'RAND_BERNOULLI':  'g--*',
          'NO_CACHE':        'k:o',
          'EDGE':         'k-o',
-         'BROKER_ASSISTED':  'b-o',
+         'BROKER_ASSISTED':  'r-o',
          'NRR':          'k-<'
                 }
 
