@@ -216,68 +216,42 @@ class BrokerAssisted(Strategy):
     @inheritdoc(Strategy)
     def process_event(self, time, receiver, content, log):
         # get all required data
-        content, confirm = self.controller.broker_map(content)
+        self.controller.start_session(time, receiver, content, log)
         # incoming shared content request
-        if confirm == 1:
+        if self.controller.broker_map(content):
             #search broker table
             replicas = self.view.broker_lookup(content)
             nearest_replica = min(replicas, key=lambda x: self.distance[receiver][x]) 
-            self.controller.start_session(time, receiver, content, log)
             self.controller.forward_request_path(receiver, nearest_replica)
             selectedr = self.controller.broker_get_replica(nearest_replica)
             path = list(reversed(self.view.shortest_path(receiver, nearest_replica)))
-            c = len([v for v in path if self.view.has_cache(v)])
-            x = 0.0
-            for hop in range(1, len(path)):
-                u = path[hop - 1]
-                v = path[hop]
-                N = sum([self.cache_size[n] for n in path[hop - 1:]
-                         if n in self.cache_size])
-                if v in self.cache_size:
-                    x += 1
+            for u, v in path_links(path):
                 self.controller.forward_content_hop(u, v)
-                if v != receiver and v in self.cache_size:
-                    # The (x/c) factor raised to the power of "c" according to the
-                    # extended version of ProbCache published in IEEE TPDS
-                    prob_cache = float(N) / (self.t_tw * self.cache_size[v]) * (x / c) ** c
-                    if random.random() < prob_cache:
-                        self.controller.broker_put_replica(v, selectedr)
+                if self.view.has_cache(v) and not self.view.cache_lookup(v, selectedr):
+                    self.controller.broker_put_replica(v, selectedr)
+       
+        #normal request
         else:
             source = self.view.content_source(content)
             path = self.view.shortest_path(receiver, source)
-
-            self.controller.start_session(time, receiver, content, log)
             # Route requests to original source and queries caches on the path
-            for hop in range(1, len(path)):
-                u = path[hop - 1]
-                v = path[hop]
+            for u, v in path_links(path):
                 self.controller.forward_request_hop(u, v)
-                if self.view.has_cache(v) :
+                if self.view.has_cache(v):
                     if self.controller.get_content(v):
                         serving_node = v
                         break
-            else:
                 # No cache hits, get content from source
                 self.controller.get_content(v)
                 serving_node = v
             # Return content
             path = list(reversed(self.view.shortest_path(receiver, serving_node)))
-            c = len([v for v in path if self.view.has_cache(v)])
-            x = 0.0
-            for hop in range(1, len(path)):
-                u = path[hop - 1]
-                v = path[hop]
-                N = sum([self.cache_size[n] for n in path[hop - 1:]
-                         if n in self.cache_size])
-                if v in self.cache_size:
-                    x += 1
+            for u, v in path_links(path):
                 self.controller.forward_content_hop(u, v)
-                if v != receiver and v in self.cache_size:
-                    # The (x/c) factor raised to the power of "c" according to the
-                    # extended version of ProbCache published in IEEE TPDS
-                    prob_cache = float(N) / (self.t_tw * self.cache_size[v]) * (x / c) ** c
-                    if random.random() < prob_cache:
-                        self.controller.put_content(v)
+                if self.view.has_cache(v):
+                    # insert content
+                    self.controller.put_content(v)
+
         self.controller.end_session()
 
 

@@ -80,10 +80,12 @@ class NetworkView(object):
         self.model = model
         
     #Broker table------------------------------
-    def broker_lookup(self, k):
+    def broker_lookup(self, origink):
         """return locations of all mapped shared content
         s"""
         i=0
+        k = origink
+        k = k % gap
         loc = set()
         while i<3:
             k += i * gap
@@ -506,10 +508,11 @@ class NetworkController(object):
         self.content = content
         self.confirm = 0
         if self.content in ss:
-            self.content = content % gap
-            self.confirm = 1
-        return self.content, self.confirm
-    
+            #self.content = content % gap
+            return True
+        else:
+            return False
+
     def broker_put_replica(self, node, replica):
         """Store content in the specified node.
 
@@ -544,35 +547,36 @@ class NetworkController(object):
         content : bool
             True if the content is available, False otherwise
         """
-        if self.session['content'] not in range(1,1001):
+        if self.session['content'] not in ss:
             return False
         selectedr = self.session['content']
-        replica = [None] * nr
+        selectedr = selectedr % gap
+        replicalist = [None] * nr
         i = 0
         while i< nr:
-            replica[i] = self.session['content'] + i*gap 
+            replicalist[i] = selectedr + i*gap 
             i+=1
         #in fact, this should be have to hit, otherwise it's error
         if node in self.model.cache:
-            for c in replica:
+            for c in replicalist:
                 cache_hit = self.model.cache[node].get(c)
                 if cache_hit:
                     #the one to retreive
-                    selectedr = c
-            if cache_hit:
-                if self.session['log']:
+                    #print ("broker cache hit")
                     self.collector.cache_hit(node)
-            else:
-                if self.session['log']:
-                    self.collector.cache_miss(node)
-            return selectedr
-        name, props = fnss.get_stack(self.model.topology, node)
-        if name == 'source' and selectedr in props['contents']:
-            if self.collector is not None and self.session['log']:
-                self.collector.server_hit(node)
-            return selectedr
-        else:
+                    return c
+            if self.session['log']:
+                self.collector.cache_miss(node)
             return False
+        name, props = fnss.get_stack(self.model.topology, node)
+        if name == 'source': 
+            for c in replicalist:
+                if c in props['contents']:
+                    if self.collector is not None and self.session['log']:
+                        self.collector.server_hit(node)
+                    return c
+            return False
+
 
     def forward_request_path(self, s, t, path=None, main_path=True):
         """Forward a request from node *s* to node *t* over the provided path.

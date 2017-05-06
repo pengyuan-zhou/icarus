@@ -87,6 +87,7 @@ class NearestReplicaRouting(Strategy):
         if self.metacaching == 'LCE':
             for u, v in path_links(path):
                 self.controller.forward_content_hop(u, v)
+                #print (self.view.has_cache(v))
                 if self.view.has_cache(v) and not self.view.cache_lookup(v, content):
                     self.controller.put_content(v)
         elif self.metacaching == 'LCD':
@@ -96,6 +97,7 @@ class NearestReplicaRouting(Strategy):
                 if not copied and v == receiver and self.view.has_cache(v):
                     self.controller.put_content(v)
                     copied = True
+                    #print ("pushed content to node :%d when receiver is :%d") % (v,receiver)
         else:
             raise ValueError('Metacaching policy %s not supported'
                              % self.metacaching)
