@@ -51,7 +51,7 @@ DATA_COLLECTORS = ['CACHE_HIT_RATIO', 'LATENCY','LINK_LOAD' ]
 ALPHA = [1.0]
 
 # Total size of network cache as a fraction of content population
-NETWORK_CACHE = [ 0.7,  0.9]#, 0.15, 0.2, 0.25]#, 0.009, 0.01, 0.05, 0.1]
+NETWORK_CACHE = [ 0.01, 0.1,  0.9]#, 0.15, 0.2, 0.25]#, 0.009, 0.01, 0.05, 0.1]
 
 DIFF = [0.2]
 
@@ -165,20 +165,19 @@ for rank_sum in RANK_SUM:
                     for diff in DIFF:
                         for workload in WORKLOADS:
                             for rank_diff in RANK_DIFF:
-                                for network_cache in NETWORK_CACHE:
-                                    experiment = copy.deepcopy(default)
-                                    experiment['topology']['name'] = topology
-                                    experiment['topology']['asns'] = ASNS
-                                    experiment['workload']['name'] = workload
-                                    experiment['workload']['rank_diff'] = rank_diff
-                                    experiment['workload']['rank_sum'] = rank_sum
-                                    experiment['workload']['network_cache'] = network_cache
-                                    experiment['workload']['diff'] = diff
-                                    experiment['workload']['alpha'] = alpha
-                                    experiment['strategy']['name'] = strategy
-                                    #experiment['strategy']['metacaching'] = 'LCE'
-                                    #experiment['strategy']['sharedSet'] = SHAREDSET
-                                    experiment['cache_placement']['network_cache'] = network_cache
-                                    experiment['desc'] = "topology: %s, strategy: %s, diff: %s, Alpha: %s, rank_sum: %s, workload :%s, rank_diff: %s,  network cache: %s" \
-                                                            % (topology, strategy, str(diff), str(alpha), str(rank_sum), workload, str(rank_diff), str(network_cache))
-                                    EXPERIMENT_QUEUE.append(experiment)
+                                experiment = copy.deepcopy(default)
+                                experiment['topology']['name'] = topology
+                                experiment['topology']['asns'] = ASNS
+                                experiment['workload']['name'] = workload
+                                experiment['workload']['rank_diff'] = rank_diff
+                                experiment['workload']['rank_sum'] = rank_sum
+                                experiment['workload']['network_cache'] = network_cache
+                                experiment['workload']['diff'] = diff
+                                experiment['workload']['alpha'] = alpha
+                                experiment['strategy']['name'] = strategy
+                                #experiment['strategy']['metacaching'] = 'LCE'
+                                #experiment['strategy']['sharedSet'] = SHAREDSET
+                                experiment['cache_placement']['network_cache'] = network_cache
+                                experiment['desc'] = "topology: %s, strategy: %s, diff: %s, Alpha: %s, rank_sum: %s, workload :%s, rank_diff: %s,  network cache: %s" \
+                                                        % (topology, strategy, str(diff), str(alpha), str(rank_sum), workload, str(rank_diff), str(network_cache))
+                                EXPERIMENT_QUEUE.append(experiment)
