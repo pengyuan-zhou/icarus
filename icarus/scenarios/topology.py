@@ -846,17 +846,24 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
         for u, v in topology.edges_iter():
             topology.edge[u][v]['weight'] = topology.edge[u][v]['delay']
 
+    for d in deg:
+        suma=0
+        for k,v in d.iteritems():
+            suma+=v
+        print ("average degree is %f" % (suma/len(d)))
     #multiple AS topology
     #we combine and import all the node,edge and attributes after individual definition of each AS
     #to provide scalability that being easier to change any one of them
     routerall = set()
     for routers in routerslist:
+        print ("number of routers is %d" % len(routers))
         routerall=routerall.union(routers)
     sourceall = set()
     for sources in sourceslist:
         sourceall=sourceall.union(sources)
     receiverall = set()
     for receivers in receiverslist:
+        print ("number of receivers is %d" % len(receivers))
         receiverall=receiverall.union(receivers)
     topo_multiAS = topologylist[0]
     #combine nodes and edges into multi AS topo

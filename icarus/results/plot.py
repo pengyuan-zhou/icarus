@@ -30,7 +30,7 @@ plt.rcParams['text.usetex'] = False
 plt.rcParams['figure.figsize'] = 8, 5
 
 # Size of font in legends
-LEGEND_SIZE = 14
+LEGEND_SIZE = 12
 
 # Plot
 PLOT_EMPTY_GRAPHS = False
@@ -146,8 +146,8 @@ def plot_lines(resultset, desc, filename, plotdir):
     """
     fig = plt.figure()
     _, ax1 = plt.subplots()
-    if 'title' in desc:
-        plt.title(desc['title'])
+    #if 'title' in desc:
+        #plt.title(desc['title'])
     if 'xlabel' in desc:
         plt.xlabel(desc['xlabel'])
     if 'ylabel' in desc:
@@ -218,7 +218,7 @@ def plot_lines(resultset, desc, filename, plotdir):
         legend_args = desc['legend_args'] if 'legend_args' in desc else {}
         if 'legend_loc' in desc:
             legend_args['loc'] = desc['legend_loc']
-        plt.legend(legend, prop={'size': LEGEND_SIZE}, **legend_args)
+        plt.legend(legend, prop={'size': LEGEND_SIZE}, bbox_to_anchor=(0.4, 0.4), **legend_args)
     plt.savefig(os.path.join(plotdir, filename), bbox_inches='tight')
     plt.close(fig)
 

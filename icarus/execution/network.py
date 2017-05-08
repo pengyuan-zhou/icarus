@@ -12,6 +12,10 @@ about the network status by calling methods of the `NetworkView` instance.
 The `NetworkController` is also responsible to notify a `DataCollectorProxy`
 of all relevant events.
 """
+import sys
+sys.path.append("../../simulation")
+from setbroker.config import sharedSet as ss
+
 import logging
 
 import networkx as nx
@@ -19,7 +23,6 @@ import fnss
 
 from icarus.registry import CACHE_POLICY
 from icarus.util import path_links, iround
-from icarus.dumb import sharedSet as ss
 from icarus.dumb import contentIDgap as gap
 from icarus.dumb import numre as nr
 

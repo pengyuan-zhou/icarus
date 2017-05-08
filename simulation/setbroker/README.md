@@ -4,7 +4,7 @@ For ICN simulation.
 result:
 plots.2017.05.06-15.09.19   : c=0.001, alpha changes, 
 plots.2017.05.06-17.22.05   : alpha=1.0, c changes
-
+18.25 :  alpha=1  20repeat
 
 
 

@@ -48,11 +48,11 @@ DATA_COLLECTORS = ['CACHE_HIT_RATIO', 'LATENCY', 'LINK_LOAD', 'PATH_STRETCH']
 # This would give problems while trying to plot the results because if for
 # example I wanted to filter experiment with alpha=0.8, experiments with
 # alpha = 0.799999999999 would not be recognized 
-ALPHA = [1.0]
+ALPHA = [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2]
 #ALPHA = [1.0]
 # Total size of network cache as a fraction of content population
-NETWORK_CACHE = [0.001, 0.005, 0.01,0.015,0.02,0.025,0.03,0.035,0.04]#, 0.005, 0.01,0.015,0.02,0.025,0.03,0.035,0.04]
-#NETWORK_CACHE = [0.001]
+#NETWORK_CACHE = [0.001, 0.005, 0.01,0.015,0.02,0.025,0.03,0.035,0.04]#, 0.005, 0.01,0.015,0.02,0.025,0.03,0.035,0.04]
+NETWORK_CACHE = [0.001]
 # Number of content objects
 N_CONTENTS = 1*10**5
 
@@ -75,6 +75,7 @@ while i<10:
     SHAREDSET[i].extend(range(200001,200001+1000*(i+1)))
     print (len(SHAREDSET[i]))
     i+=1
+
 # List of all implemented topologies
 # Topology implementations are located in ./icarus/scenarios/topology.py
 TOPOLOGIES =  [
@@ -92,15 +93,15 @@ ASNS = [1221,1755,3967]
 STRATEGIES = [
      #'LCE',             # Leave Copy Everywhere
      #'NO_CACHE',        # No caching, shorest-path routing
-     #'HR_SYMM',         # Symmetric hash-routing
-     #'HR_ASYMM',        # Asymmetric hash-routing
-     #'HR_MULTICAST',    # Multicast hash-routing
-     #'HR_HYBRID_AM',    # Hybrid Asymm-Multicast hash-routing
-     #'HR_HYBRID_SM',    # Hybrid Symm-Multicast hash-routing
+     'HR_SYMM',         # Symmetric hash-routing
+     'HR_ASYMM',        # Asymmetric hash-routing
+     'HR_MULTICAST',    # Multicast hash-routing
+     'HR_HYBRID_AM',    # Hybrid Asymm-Multicast hash-routing
+     'HR_HYBRID_SM',    # Hybrid Symm-Multicast hash-routing
      #'CL4M',            # Cache less for more
      #'PROB_CACHE',      # ProbCache
      #'LCD',             # Leave Copy Down
-     #'NRR',     # Random choice: cache in one random cache on path
+     'NRR',     # Random choice: cache in one random cache on path
      #'RAND_BERNOULLI',  # Random Bernoulli: cache randomly in caches on path
      'BROKER_ASSISTED'
              ]
@@ -129,18 +130,15 @@ default['content_placement']['name'] = 'UNIFORM'
 default['cache_policy']['name'] = CACHE_POLICY
 default['topology']['asns'] = ASNS
 # Create experiments multiplexing all desired parameters
-for sharedset in SHAREDSET:
-    for alpha in ALPHA:
-        for strategy in STRATEGIES:
-            for topology in TOPOLOGIES:
-                for network_cache in NETWORK_CACHE:
-                    experiment = copy.deepcopy(default)
-                    sharedSet = sharedset
-                    experiment['Sharedset']['set'] = sharedset
-                    experiment['workload']['alpha'] = alpha
-                    experiment['strategy']['name'] = strategy
-                    experiment['topology']['name'] = topology
-                    experiment['cache_placement']['network_cache'] = network_cache
-                    experiment['desc'] = "Alpha: %s, strategy: %s, topology: %s, network cache: %s" \
-                                         % (str(alpha), strategy, topology, str(network_cache))
-                    EXPERIMENT_QUEUE.append(experiment)
+for alpha in ALPHA:
+    for strategy in STRATEGIES:
+        for topology in TOPOLOGIES:
+            for network_cache in NETWORK_CACHE:
+                experiment = copy.deepcopy(default)
+                experiment['workload']['alpha'] = alpha
+                experiment['strategy']['name'] = strategy
+                experiment['topology']['name'] = topology
+                experiment['cache_placement']['network_cache'] = network_cache
+                experiment['desc'] = "Alpha: %s, strategy: %s, topology: %s, network cache: %s" \
+                                     % (str(alpha), strategy, topology, str(network_cache))
+                EXPERIMENT_QUEUE.append(experiment)
