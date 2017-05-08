@@ -30,7 +30,7 @@ RESULTS_FORMAT = 'PICKLE'
 
 # Number of times each experiment is replicated
 # This is necessary for extracting confidence interval of selected metrics
-N_REPLICATIONS = 5
+N_REPLICATIONS = 20
 
 # List of metrics to be measured in the experiments
 # The implementation of data collectors are located in ./icaurs/execution/collectors.py
@@ -67,6 +67,14 @@ N_WARMUP_REQUESTS = 3*10**5
 # to generate results. 
 N_MEASURED_REQUESTS = 6*10**5
 
+i=0
+SHAREDSET= [None]*10
+while i<10:
+    SHAREDSET[i]= range(1,1+1000*(i+1))
+    SHAREDSET[i].extend(range(100001,100001+1000*(i+1)))
+    SHAREDSET[i].extend(range(200001,200001+1000*(i+1)))
+    print (len(SHAREDSET[i]))
+    i+=1
 # List of all implemented topologies
 # Topology implementations are located in ./icarus/scenarios/topology.py
 TOPOLOGIES =  [
@@ -84,15 +92,15 @@ ASNS = [1221,1755,3967]
 STRATEGIES = [
      #'LCE',             # Leave Copy Everywhere
      #'NO_CACHE',        # No caching, shorest-path routing
-     #'HR_SYMM',         # Symmetric hash-routing
-     #'HR_ASYMM',        # Asymmetric hash-routing
-     #'HR_MULTICAST',    # Multicast hash-routing
-     #'HR_HYBRID_AM',    # Hybrid Asymm-Multicast hash-routing
-     #'HR_HYBRID_SM',    # Hybrid Symm-Multicast hash-routing
+     'HR_SYMM',         # Symmetric hash-routing
+     'HR_ASYMM',        # Asymmetric hash-routing
+     'HR_MULTICAST',    # Multicast hash-routing
+     'HR_HYBRID_AM',    # Hybrid Asymm-Multicast hash-routing
+     'HR_HYBRID_SM',    # Hybrid Symm-Multicast hash-routing
      #'CL4M',            # Cache less for more
      #'PROB_CACHE',      # ProbCache
      #'LCD',             # Leave Copy Down
-     #'NRR',     # Random choice: cache in one random cache on path
+     'NRR',     # Random choice: cache in one random cache on path
      #'RAND_BERNOULLI',  # Random Bernoulli: cache randomly in caches on path
      'BROKER_ASSISTED'
              ]
@@ -121,15 +129,18 @@ default['content_placement']['name'] = 'UNIFORM'
 default['cache_policy']['name'] = CACHE_POLICY
 default['topology']['asns'] = ASNS
 # Create experiments multiplexing all desired parameters
-for alpha in ALPHA:
-    for strategy in STRATEGIES:
-        for topology in TOPOLOGIES:
-            for network_cache in NETWORK_CACHE:
-                experiment = copy.deepcopy(default)
-                experiment['workload']['alpha'] = alpha
-                experiment['strategy']['name'] = strategy
-                experiment['topology']['name'] = topology
-                experiment['cache_placement']['network_cache'] = network_cache
-                experiment['desc'] = "Alpha: %s, strategy: %s, topology: %s, network cache: %s" \
-                                     % (str(alpha), strategy, topology, str(network_cache))
-                EXPERIMENT_QUEUE.append(experiment)
+for sharedset in SHAREDSET:
+    for alpha in ALPHA:
+        for strategy in STRATEGIES:
+            for topology in TOPOLOGIES:
+                for network_cache in NETWORK_CACHE:
+                    experiment = copy.deepcopy(default)
+                    sharedSet = sharedset
+                    experiment['Sharedset']['set'] = sharedset
+                    experiment['workload']['alpha'] = alpha
+                    experiment['strategy']['name'] = strategy
+                    experiment['topology']['name'] = topology
+                    experiment['cache_placement']['network_cache'] = network_cache
+                    experiment['desc'] = "Alpha: %s, strategy: %s, topology: %s, network cache: %s" \
+                                         % (str(alpha), strategy, topology, str(network_cache))
+                    EXPERIMENT_QUEUE.append(experiment)

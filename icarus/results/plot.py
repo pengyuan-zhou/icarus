@@ -30,7 +30,7 @@ plt.rcParams['text.usetex'] = False
 plt.rcParams['figure.figsize'] = 8, 5
 
 # Size of font in legends
-LEGEND_SIZE = 12
+LEGEND_SIZE = 14
 
 # Plot
 PLOT_EMPTY_GRAPHS = False
@@ -149,9 +149,9 @@ def plot_lines(resultset, desc, filename, plotdir):
     #if 'title' in desc:
         #plt.title(desc['title'])
     if 'xlabel' in desc:
-        plt.xlabel(desc['xlabel'])
+        plt.xlabel(desc['xlabel'], fontsize=20)
     if 'ylabel' in desc:
-        plt.ylabel(desc['ylabel'])
+        plt.ylabel(desc['ylabel'], fontsize=20)
     if 'xscale' in desc:
         plt.xscale(desc['xscale'])
     if 'yscale' in desc:
@@ -194,6 +194,7 @@ def plot_lines(resultset, desc, filename, plotdir):
                     if v.getval(ymetrics[i]) is not None]
             confidence = desc['confidence'] if 'confidence' in desc else 0.95
             means[j], err[j] = means_confidence_interval(data, confidence)
+            print ("%f,%f") % (xvals[j],means[j])
         yerr = None if 'errorbar' in desc and not desc['errorbar'] or all(err == 0) else err
         fmt = desc['line_style'][yvals[i]] if 'line_style' in desc \
               and yvals[i] in desc['line_style'] else '-'
@@ -218,7 +219,8 @@ def plot_lines(resultset, desc, filename, plotdir):
         legend_args = desc['legend_args'] if 'legend_args' in desc else {}
         if 'legend_loc' in desc:
             legend_args['loc'] = desc['legend_loc']
-        plt.legend(legend, prop={'size': LEGEND_SIZE}, bbox_to_anchor=(0.4, 0.4), **legend_args)
+        plt.legend(legend, prop={'size': LEGEND_SIZE},  **legend_args)
+        #plt.legend(legend, prop={'size': LEGEND_SIZE}, bbox_to_anchor=(0.4, 0.4), **legend_args)
     plt.savefig(os.path.join(plotdir, filename), bbox_inches='tight')
     plt.close(fig)
 
