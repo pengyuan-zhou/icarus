@@ -386,7 +386,6 @@ def run(config, results, plotdir):
     # Parse params from settings
     topologies = settings.TOPOLOGIES
     cache_sizes = settings.NETWORK_CACHE
-    sharedsets= settings.SHAREDSET
     alphas = settings.ALPHA
     strategies = settings.STRATEGIES
     # Plot graphs
