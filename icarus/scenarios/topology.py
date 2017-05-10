@@ -813,7 +813,6 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
         # src_ASj_i means the i_th source node in AS_j
         sourceslist[j] =['src_AS%d_%d' % (j,i) for i in range(n_sources)]    
         j += 1
-    print (sourceslist)
     # node degree
     deg = [nx.degree(topology) for topology in topologylist]
     # Attach sources based on their degree purely, but they may end up quite clustered
@@ -896,7 +895,6 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
     for v in routerall:
         fnss.add_stack(topo_multiAS, v, 'router')
     for u, v in topo_multiAS.edges():
-        print(u,v,topo_multiAS.edge[u][v])
         if u in sources or v in sources:
             topo_multiAS.edge[u][v]['type'] = 'external'
             # this prevents sources to be used to route traffic
