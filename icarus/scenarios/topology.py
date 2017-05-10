@@ -789,44 +789,43 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
     """
     if source_ratio < 0 or source_ratio > 1:
         raise ValueError('source_ratio must be comprised between 0 and 1')
+    # read rocketfuel files, depending on asns set by config.py
     f_t = [ path.join(TOPOLOGY_RESOURCES_DIR, 'rocketfuel-latency', str(i), 'latencies.intra') for i in asns]
     topologytmp = [fnss.parse_rocketfuel_isp_latency(i).to_undirected() for i in f_t]
+    # topology list of files
     topologylist = [list(nx.connected_component_subgraphs(i))[0] for i in topologytmp]
+    # relabel topology nodes with mapping function defined below, to differentiate nodes from different files
+    topologylist = [nx.relabel_nodes(topology,mapping, copy=False) for topology in topologylist]
     # First mark all current links as inernal
-    for topology in topologylist:
-        j = topologylist.index(topology)
-        while j>=1:
-            topology=nx.relabel_nodes(topology,mapping, copy=False)
-            j -= 1
-    for topology in topologylist:
-        for u, v in topology.edges_iter():
-            topology.edge[u][v]['type'] = 'internal'
-	
+    #for topology in topologylist:
+        #for u, v in topology.edges_iter():
+            #topology.edge[u][v]['type'] = 'internal'
+	topology.edge[u][v]['type'] = 'internal' for u, v in topology.edges_iter() for topogy in topologylist
+    print (topology.edges() for topology in topologylist)
 	# Note: I don't need to filter out nodes with degree 1 cause they all have
     # a greater degree value but we compute degree to decide where to attach sources
-    
+    # router nodes
     routerslist = [topology.nodes() for topology in topologylist]
-    # Source attachment, only define 3 publishers for each AS (only for the ICN17 paper simulation)
-    #n_sourceslist = [int(source_ratio * len(routers)) for routers in routerslist]
-    numSource = 3 #number of source nodes each AS
-    n_sourceslist = [numSource for routers in routerslist]  #only for ICN17
-    sourceslist = [None] * len(n_sourceslist) 
-    j = 0 #only for ICN17
-    for n_sources in n_sourceslist:
+    #n_sourceslist = [3] * len(asns) #number of source nodes each AS, can be change to any
+    #sourceslist = [None] * len(asns) #source nodes list
+    #for n_sources in n_sourceslist:
         #j = n_sourceslist.index(n_sources)
-        sourceslist[j] =['src_AS%d_%d' % (j,i) for i in range(n_sources)]    
-        j += 1  #only for ICN17
+        # src_ASj_i means the i_th source node in AS_j
+    # source nodes
+    sourceslist =['src_AS%d_%d' % (j,i) for j in range(len(asns)) for i in range(n_sources)]    
+    # node degree
     deg = [nx.degree(topology) for topology in topologylist]
     # Attach sources based on their degree purely, but they may end up quite clustered
-    #routerslistsort = [ sorted(routers, key=lambda k: deg[routerslist.index(routers)][k], reverse=True) for routers in routerslist ]
-    for routers in routerslist:
-        j=routerslist.index(routers)
-        routers = sorted(routers, key=lambda k: deg[j][k], reverse=True)
+    #for routers in routerslist:
+        #j=routerslist.index(routers)
+    # sort routers by degree within each AS
+    routers = [sorted(routers, key=lambda k: deg[j][k], reverse=True) for routers in routerslist]
+    # add source to router links
     for sources in sourceslist:
         j = sourceslist.index(sources)
         for i in range(len(sources)):
-            #intra AS link set as internal, source to router delay bigger than router to receiver
-            topologylist[j].add_edge(sources[i], routerslist[j][i], delay=1, type='internal')
+            # inter AS router to router, is simulating Border Router,
+            topologylist[j].add_edge(routers[i], routerslist[j][i], delay=1, type='internal')
             #inter AS link set as external, AS_i source connect to AS_i+1(cycle of list)  router
             if j==(len(sourceslist)-1):
                 topologylist[j].add_edge(sources[i], routerslist[0][i], delay=ext_delay, type='external')
