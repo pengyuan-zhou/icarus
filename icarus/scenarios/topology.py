@@ -806,13 +806,14 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
             topology.edge[u][v]['type'] = 'internal'
     # router nodes
     routerslist = [topology.nodes() for topology in topologylist]
-    n_sourceslist = [3] * len(asns) #number of source nodes each AS, can be change to any
+    n_sourceslist = [int(source_ratio * len(routers)) for routers in routerslist]#[3] * len(asns) #number of source nodes each AS, can be change to any
     sourceslist = [None] * len(asns) #source nodes list
     j=0
     for n_sources in n_sourceslist:
         # src_ASj_i means the i_th source node in AS_j
         sourceslist[j] =['src_AS%d_%d' % (j,i) for i in range(n_sources)]    
         j += 1
+    print (sourceslist)
     # node degree
     deg = [nx.degree(topology) for topology in topologylist]
     # Attach sources based on their degree purely, but they may end up quite clustered
