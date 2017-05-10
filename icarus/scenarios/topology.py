@@ -797,13 +797,10 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
     # relabel topology nodes with mapping function defined below, to differentiate nodes from different files
     topologylist = [nx.relabel_nodes(topology,mapping, copy=False) for topology in topologylist]
     # First mark all current links as inernal
-    #for topology in topologylist:
-        #for u, v in topology.edges_iter():
-            #topology.edge[u][v]['type'] = 'internal'
-	topology.edge[u][v]['type'] = 'internal' for u, v in topology.edges_iter() for topogy in topologylist
+    for topology in topologylist:
+        for u, v in topology.edges_iter():
+            topology.edge[u][v]['type'] = 'internal'
     print (topology.edges() for topology in topologylist)
-	# Note: I don't need to filter out nodes with degree 1 cause they all have
-    # a greater degree value but we compute degree to decide where to attach sources
     # router nodes
     routerslist = [topology.nodes() for topology in topologylist]
     #n_sourceslist = [3] * len(asns) #number of source nodes each AS, can be change to any
@@ -824,13 +821,14 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
     for sources in sourceslist:
         j = sourceslist.index(sources)
         for i in range(len(sources)):
-            # inter AS router to router, is simulating Border Router,
-            topologylist[j].add_edge(routers[i], routerslist[j][i], delay=1, type='internal')
+            ##intra AS link set as internal, source to router delay bigger than router to receiver
+            topologylist[j].add_edge(sources[i], routerslist[j][i], delay=1, type='internal')
             #inter AS link set as external, AS_i source connect to AS_i+1(cycle of list)  router
-            if j==(len(sourceslist)-1):
-                topologylist[j].add_edge(sources[i], routerslist[0][i], delay=ext_delay, type='external')
-            else:            
-                topologylist[j].add_edge(sources[i], routerslist[j+1][i], delay=ext_delay, type='external')
+            if i<2: # set ABR, we think 2ABR is a normal case between ASes
+                if j==(len(sourceslist)-1):
+                    topologylist[j].add_edge(routerslist[j][i], routerslist[0][i], delay=ext_delay, type='external')
+                else:            
+                    topologylist[j].add_edge(routerslist[j][i], routerslist[j+1][i], delay=ext_delay, type='external')
  
 
     # attach artificial receiver nodes to ICR candidates
