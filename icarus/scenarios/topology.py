@@ -776,8 +776,8 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
     with annotated latencies. Each topology works as an individual AS. 
     To each node of the parsed topology it is attached an artificial receiver
     node. To the routers with highest degree it is also attached a source node.
-    The intra AS links are set with internal delay while inter AS source-router
-    links are set with external delay.
+    The intra AS links are set with internal delay while ABR to ABR
+    links are set with external delay. There are 2 ABRs between each two ASes.
     Parameters
     ----------
     asns : int list
@@ -795,28 +795,31 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
     # topology list of files
     topologylist = [list(nx.connected_component_subgraphs(i))[0] for i in topologytmp]
     # relabel topology nodes with mapping function defined below, to differentiate nodes from different files
-    topologylist = [nx.relabel_nodes(topology,mapping, copy=False) for topology in topologylist]
+    for topology in topologylist:
+        j = topologylist.index(topology)
+        while j>=1:
+            topology=nx.relabel_nodes(topology,mapping, copy=False)
+            j -= 1
     # First mark all current links as inernal
     for topology in topologylist:
         for u, v in topology.edges_iter():
             topology.edge[u][v]['type'] = 'internal'
-    print (topology.edges() for topology in topologylist)
     # router nodes
     routerslist = [topology.nodes() for topology in topologylist]
-    #n_sourceslist = [3] * len(asns) #number of source nodes each AS, can be change to any
-    #sourceslist = [None] * len(asns) #source nodes list
-    #for n_sources in n_sourceslist:
-        #j = n_sourceslist.index(n_sources)
+    n_sourceslist = [3] * len(asns) #number of source nodes each AS, can be change to any
+    sourceslist = [None] * len(asns) #source nodes list
+    j=0
+    for n_sources in n_sourceslist:
         # src_ASj_i means the i_th source node in AS_j
-    # source nodes
-    sourceslist =['src_AS%d_%d' % (j,i) for j in range(len(asns)) for i in range(n_sources)]    
+        sourceslist[j] =['src_AS%d_%d' % (j,i) for i in range(n_sources)]    
+        j += 1
     # node degree
     deg = [nx.degree(topology) for topology in topologylist]
     # Attach sources based on their degree purely, but they may end up quite clustered
-    #for routers in routerslist:
-        #j=routerslist.index(routers)
-    # sort routers by degree within each AS
-    routers = [sorted(routers, key=lambda k: deg[j][k], reverse=True) for routers in routerslist]
+    for routers in routerslist:
+        j=routerslist.index(routers)
+        # sort routers by degree within each AS
+        routers = sorted(routers, key=lambda k: deg[j][k], reverse=True) 
     # add source to router links
     for sources in sourceslist:
         j = sourceslist.index(sources)
@@ -826,9 +829,13 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
             #inter AS link set as external, AS_i source connect to AS_i+1(cycle of list)  router
             if i<2: # set ABR, we think 2ABR is a normal case between ASes
                 if j==(len(sourceslist)-1):
-                    topologylist[j].add_edge(routerslist[j][i], routerslist[0][i], delay=ext_delay, type='external')
+                    # we set ABR to ABR dely as 25% of mean tested inter AS delay.
+                    # we test average intra AS delay is 75
+                    # 25% is taken from paper:
+                    # http://ieeexplore.ieee.org/document/1378228/
+                    topologylist[j].add_edge(routerslist[j][i], routerslist[0][i], delay=25, type='external')
                 else:            
-                    topologylist[j].add_edge(routerslist[j][i], routerslist[j+1][i], delay=ext_delay, type='external')
+                    topologylist[j].add_edge(routerslist[j][i], routerslist[j+1][i], delay=25, type='external')
  
 
     # attach artificial receiver nodes to ICR candidates
@@ -842,32 +849,33 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
     for topology in topologylist:
         for u, v in topology.edges_iter():
             topology.edge[u][v]['weight'] = topology.edge[u][v]['delay']
+    # for print average degree of each AS
+    #for d in deg:
+        #suma=0
+        #for k,v in d.iteritems():
+            #suma+=v
+        #print ("average degree is %f" % (suma/len(d)))
 
-    for d in deg:
-        suma=0
-        for k,v in d.iteritems():
-            suma+=v
-        print ("average degree is %f" % (suma/len(d)))
     #multiple AS topology
     #we combine and import all the node,edge and attributes after individual definition of each AS
     #to provide scalability that being easier to change any one of them
     routerall = set()
     for routers in routerslist:
-        print ("number of routers is %d" % len(routers))
         routerall=routerall.union(routers)
     sourceall = set()
     for sources in sourceslist:
         sourceall=sourceall.union(sources)
     receiverall = set()
     for receivers in receiverslist:
-        print ("number of receivers is %d" % len(receivers))
         receiverall=receiverall.union(receivers)
+
     topo_multiAS = topologylist[0]
     #combine nodes and edges into multi AS topo
     for topology in topologylist[1:]:
         for v in topology.nodes():
             topo_multiAS.add_node(v)
         topo_multiAS.add_edges_from(topology.edges())
+
     #set attribute
     topo_multiAS.graph['icr_candidates']=set(routerall) 
     for topology in topologylist:    
@@ -878,6 +886,7 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
         nx.set_edge_attributes(topo_multiAS,'delay',delays)
         nx.set_edge_attributes(topo_multiAS,'type',types)
         nx.set_edge_attributes(topo_multiAS,'weight',weights)
+
     # Deploy stacks on nodes
     for v in sourceall:
         fnss.add_stack(topo_multiAS, v, 'source')
@@ -886,6 +895,7 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
     for v in routerall:
         fnss.add_stack(topo_multiAS, v, 'router')
     for u, v in topo_multiAS.edges():
+        print(u,v,topo_multiAS.edge[u][v])
         if u in sources or v in sources:
             topo_multiAS.edge[u][v]['type'] = 'external'
             # this prevents sources to be used to route traffic
