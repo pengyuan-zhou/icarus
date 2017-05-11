@@ -59,7 +59,7 @@ def ases_content_placement(topology, asns, rank_sum, contents, seed=None):
     sourcelistas = [None] * len(asns)
     # divide source nodes by AS
     sourcelistas = [[j for j in sourcelist if ('S%d' % i) in j] for i in range(len(asns))]
-   
+    numSource = sum(len(source) for source in sourcelistas) 
     content_placement = collections.defaultdict(set)
     # problem1. how to divide content set according to user number of AS, which is more realistic, now is cut evenly
     # problem2, how to let users within each AS send request following majorly the set distribution, to make it make sense.
@@ -67,15 +67,14 @@ def ases_content_placement(topology, asns, rank_sum, contents, seed=None):
     # first divide global content set into each AS, with static overlap ratio, resulting in
     # some ASes have smaller while others have bigger overlap
     # then divide content set of each AS into each Publisher, follow the same way
-    # overlap(OL) intra AS, OL_inter_AS
-    ola=0.4#overlap of publishers intra AS
-    ole=0.2#overlap of content sets inter AS
-    #sizeAS * len(asns) - sizeAS * ole * (len(asns)-1) = len(contents)
-    sizeAS = len(content)/(len(asns) - ole*(len(asns)-1)) # size of content set of each AS
-    sizeP_ASi = sizeAS/(len(sourcelistas[i]) - ola*(len(sourcelistas[i])-1))#size of content set of each publisher
-    size = int(len(contents)/numSource) #source in diff ASes have same contents,which doesn't influence since we block inter AS transfer by defining largeinter AS delay
-    print ("each source node have %d content" % size)
-    source_nodes = sorted(source_nodes)
+    # assign content placement accroding to size of AS, e.g., number of source nodes.
+    size_AS = [None] * len(asns)
+    for i in range(len(asns)):
+        if i < len(asns)-1 :
+            size_AS[i] = int(len(contents) * len(sourcelistas[i])/numSource)
+        else:
+            size_AS[i] = len(contents) - sum(size_AS[:i])
+    #source_nodes = sorted(source_nodes)
     #we define different zize of publishers(number of connected ASes)
     #through combining source nodes, i.e., if let src_AS0_0 store the
     #same content set with src_AS0_0, then they are one publisher
