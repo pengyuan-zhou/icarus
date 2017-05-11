@@ -27,8 +27,7 @@ def apply_content_placement(placement, topology):
         topology.node[v]['stack'][1]['contents'] = contents
 def get_sources(topology):
     return [v for v in topology if topology.node[v]['stack'][0] == 'source']
-
-@register_content_placement('ASes')
+@register_content_placement('ASES')
 def ases_content_placement(topology, asns, rank_sum, contents, seed=None):
     """Places content sets to source nodes randomly following a uniform
     distribution.
@@ -53,10 +52,14 @@ def ases_content_placement(topology, asns, rank_sum, contents, seed=None):
     achieved by using a fix seed value
     """
     random.seed(seed)
-    source_nodes = get_sources(topology)
+    sourcelist = get_sources(topology)
+    sourcelist.sort()
+    sourcelistas = [None] * len(asns)
+    # divide source nodes by AS
+    sourcelistas = [[j for j in sourcelist if ('S%d' % i) in j] for i in range(len(asns))]
+   
     content_placement = collections.defaultdict(set)
-    numSource = len(source_nodes)/len(asns) #the number of source nodes in each AS ## only for when signing eaualing number of nodes 
-    #we divide content by source nodes in each AS
+    # logic of placement: at least includes: 1. share intra AS 2. share inter AS
     size = int(len(contents)/numSource) #source in diff ASes have same contents,which doesn't influence since we block inter AS transfer by defining largeinter AS delay
     print ("each source node have %d content" % size)
     source_nodes = sorted(source_nodes)

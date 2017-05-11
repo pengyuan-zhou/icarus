@@ -30,7 +30,7 @@ RESULTS_FORMAT = 'PICKLE'
 
 # Number of times each experiment is replicated
 # This is necessary for extracting confidence interval of selected metrics
-N_REPLICATIONS = 5
+N_REPLICATIONS = 1
 
 # List of metrics to be measured in the experiments
 # The implementation of data collectors are located in ./icaurs/execution/collectors.py
@@ -51,8 +51,8 @@ DATA_COLLECTORS = ['CACHE_HIT_RATIO', 'LATENCY', 'LINK_LOAD', 'PATH_STRETCH']
 ALPHA = [1.0]
 #ALPHA = [1.0]
 # Total size of network cache as a fraction of content population
-NETWORK_CACHE = [0.001, 0.005, 0.01,0.015,0.02,0.025,0.03,0.035,0.04]#, 0.005, 0.01,0.015,0.02,0.025,0.03,0.035,0.04]
-#NETWORK_CACHE = [0.001]
+#NETWORK_CACHE = [0.001, 0.005, 0.01,0.015,0.02,0.025,0.03,0.035,0.04]#, 0.005, 0.01,0.015,0.02,0.025,0.03,0.035,0.04]
+NETWORK_CACHE = [0.001]
 # Number of content objects
 N_CONTENTS = 1*10**5
 
@@ -117,7 +117,7 @@ default['workload'] = {'name':       'DIFFRANK',
                        'rate':       NETWORK_REQUEST_RATE
                        }
 default['cache_placement']['name'] = 'UNIFORM'
-default['content_placement']['name'] = 'UNIFORM'
+default['content_placement']['name'] = 'ASES'
 default['cache_policy']['name'] = CACHE_POLICY
 default['topology']['asns'] = ASNS
 # Create experiments multiplexing all desired parameters
