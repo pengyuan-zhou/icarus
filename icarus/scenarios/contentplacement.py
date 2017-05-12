@@ -79,20 +79,19 @@ def ases_content_placement(topology, asns, rank_sum, contents, seed=None):
     #through combining source nodes, i.e., if let src_AS0_0 store the
     #same content set with src_AS0_0, then they are one publisher
     #that can let us define different publishers connected with different ASes.
-    v=0
-    while v < len(source_nodes):
+    for source in sourcelistas:
+        size = size_AS[i]/len(source)
+        i=0
+        while i < len(source):
         #the last source node will have slide more contents than others, to cover all the contents in the global set
         # only for when signing eaualing number of nodes
-        i = 0
-        while i < numSource: 
-            if (i == numSource-1):
-                for c in contents[(size*i):]:
-                    content_placement[source_nodes[v]].add(c)
-            else:
-                for c in contents[size*i:size*(i+1)]:
-                    content_placement[source_nodes[v]].add(c)
-            i += 1 
-            v += 1
+                if (i == len(source)-1):
+                    for c in contents[(size*i):]:
+                        content_placement[source[i]].add(c)
+                else:
+                    for c in contents[size*i:size*(i+1)]:
+                        content_placement[source[i].add(c)
+                i += 1 
     apply_content_placement(content_placement, topology)
     
     
