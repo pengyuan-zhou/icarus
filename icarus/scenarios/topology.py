@@ -810,7 +810,8 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
     # router nodes
     routerslist = [topology.nodes() for topology in topologylist]
     # source nodes
-    n_sourceslist = [int(source_ratio * len(routers)) for routers in routerslist]
+    #n_sourceslist = [int(source_ratio * len(routers)) for routers in routerslist]
+    n_sourceslist = [3 for routers in routerslist]
     sourceslist = [None] * len(asns) 
     j=0
     for n_sources in n_sourceslist:
