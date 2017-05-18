@@ -82,7 +82,7 @@ ASNS = [1221,1755,3967]
 # List of caching and routing strategies
 # The code is located in ./icarus/models/strategy.py
 STRATEGIES = [
-     #'LCE',             # Leave Copy Everywhere
+     'LCE'#,             # Leave Copy Everywhere
      #'NO_CACHE',        # No caching, shorest-path routing
      #'HR_SYMM',         # Symmetric hash-routing
      #'HR_ASYMM',        # Asymmetric hash-routing
@@ -94,7 +94,7 @@ STRATEGIES = [
      #'LCD',             # Leave Copy Down
      #'NRR',     # Random choice: cache in one random cache on path
      #'RAND_BERNOULLI',  # Random Bernoulli: cache randomly in caches on path
-     'BROKER_ASSISTED'
+     #'BROKER_ASSISTED'
              ]
 
 # Cache replacement policy used by the network caches.

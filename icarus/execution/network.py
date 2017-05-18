@@ -81,6 +81,12 @@ class NetworkView(object):
         self.model = model
         
     #Broker table------------------------------
+    def brokertablelist(self):
+        """return list of all broker tables
+        """
+        #return self.model.brokertablelist
+        for node in self.model.cache:
+            print(self.model.cache[node].dump())
     def broker_lookup(self, origink):
         """return locations of all mapped shared content
         s"""
@@ -418,6 +424,10 @@ class NetworkModel(object):
         #key point!!!!!!!!!!!!!!!!!!!!!!!!!
         self.cache = {node: CACHE_POLICY[policy_name](cache_size[node], **policy_args)
                           for node in cache_size}
+        
+        #self.brokertablelist={self.cache[node] for node in list(self.cache.keys())}
+        self.brokertablelist=list(cache_size)#[list(self.cache.keys())[0]].dump()
+        print (self.brokertablelist)
         # This is for a local un-coordinated cache (currently used only by
         # Hashrouting with edge cache)
         self.local_cache = {}

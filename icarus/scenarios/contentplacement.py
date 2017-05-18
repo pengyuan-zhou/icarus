@@ -25,7 +25,7 @@ def apply_content_placement(placement, topology):
     """
     for v, contents in placement.items():
         topology.node[v]['stack'][1]['contents'] = contents
-        print (v,len(contents))
+        print ("source node %s has content size of %d, ID from %s to %s") % (v, len(contents), str(sorted(list(contents))[0]), str(sorted(list(contents))[-1]))
 def get_sources(topology):
     return [v for v in topology if topology.node[v]['stack'][0] == 'source']
 
@@ -107,6 +107,7 @@ def ases_content_placement(topology, asns, rank_sum, contents, seed=None):
                 for c in content_AS[sourcelistas.index(source)][size*i:size*(i+1)]:
                     content_placement[source[i]].add(c)
             i+=1
+
  
     apply_content_placement(content_placement, topology)
     

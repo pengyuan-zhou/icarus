@@ -11,6 +11,7 @@ import copy
 
 import numpy as np
 
+from icarus.dumb import sharedset as ss
 from icarus.util import inheritdoc, apportionment
 from icarus.registry import register_cache_policy
 
@@ -498,6 +499,18 @@ class Cache(object):
         """
         raise NotImplementedError('This method is not implemented')
 
+    @abc.abstractmethod
+    def dumpshare(self):
+        """Return a dump of all the elements currently in the cache possibly
+        sorted according to the eviction policy.
+
+        Returns
+        -------
+        cache_dump : list
+            The list of all items currently stored in the cache
+        """
+        raise NotImplementedError('This method is not implemented')
+
     def do(self, op, k, *args, **kwargs):
         """Utility method that performs a specified operation on a given item.
 
@@ -850,6 +863,10 @@ class LruCache(Cache):
     @inheritdoc(Cache)
     def dump(self):
         return list(iter(self._cache))
+
+    @inheritdoc(Cache)
+    def dumpshare(self):
+        return list(i for i in iter(self._cache) if i in ss)
 
     def position(self, k, *args, **kwargs):
         """Return the current position of an item in the cache. Position *0*
