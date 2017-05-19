@@ -52,7 +52,7 @@ ALPHA = [1.0]
 #ALPHA = [1.0]
 # Total size of network cache as a fraction of content population
 #NETWORK_CACHE = [0.001, 0.005, 0.01,0.015,0.02,0.025,0.03,0.035,0.04]#, 0.005, 0.01,0.015,0.02,0.025,0.03,0.035,0.04]
-NETWORK_CACHE = [0.001]
+NETWORK_CACHE = [0.1]
 # Number of content objects
 N_CONTENTS = 1*10**5
 
@@ -82,7 +82,7 @@ ASNS = [1221,1755,3967]
 # List of caching and routing strategies
 # The code is located in ./icarus/models/strategy.py
 STRATEGIES = [
-     'LCE'#,             # Leave Copy Everywhere
+     #'LCE'#,             # Leave Copy Everywhere
      #'NO_CACHE',        # No caching, shorest-path routing
      #'HR_SYMM',         # Symmetric hash-routing
      #'HR_ASYMM',        # Asymmetric hash-routing
@@ -94,7 +94,7 @@ STRATEGIES = [
      #'LCD',             # Leave Copy Down
      #'NRR',     # Random choice: cache in one random cache on path
      #'RAND_BERNOULLI',  # Random Bernoulli: cache randomly in caches on path
-     #'BROKER_ASSISTED'
+     'BROKER_ASSISTED'
              ]
 
 # Cache replacement policy used by the network caches.

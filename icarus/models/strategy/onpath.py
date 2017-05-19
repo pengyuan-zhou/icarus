@@ -18,6 +18,7 @@ __all__ = [
        'CacheLessForMore',
        'RandomBernoulli',
        'RandomChoice',
+       'BrokerAssistedIdeal',
        'BrokerAssisted'
            ]
 
@@ -131,9 +132,8 @@ class LeaveCopyEverywhere(Strategy):
     @inheritdoc(Strategy)
     def process_event(self, time, receiver, content, log):
         # get all required data
+        #print (self.view.brokertablelist())
         source = self.view.content_source(content)
-        print (self.view.brokertablelist)
-        
         path = self.view.shortest_path(receiver, source)
         # Route requests to original source and queries caches on the path
         self.controller.start_session(time, receiver, content, log)
@@ -205,8 +205,8 @@ class LeaveCopyDown(Strategy):
         self.controller.end_session()
 
 
-@register_strategy('BROKER_ASSISTED')
-class BrokerAssisted(Strategy):
+@register_strategy('BROKER_ASSISTED_IDEAL')
+class BrokerAssistedIdeal(Strategy):
 
     @inheritdoc(Strategy)
     def __init__(self, view, controller,  t_tw=10):
@@ -257,6 +257,80 @@ class BrokerAssisted(Strategy):
         self.controller.end_session()
 
 
+@register_strategy('BROKER_ASSISTED')
+class BrokerAssisted(Strategy):
+
+    @inheritdoc(Strategy)
+    def __init__(self, view, controller,  t_tw=10):
+        super(BrokerAssisted, self).__init__(view, controller)
+        self.t_tw = t_tw
+        self.cache_size = view.cache_nodes(size=True)
+        self.distance = nx.all_pairs_dijkstra_path_length(self.view.topology(), weight='delay')
+        self.syncacheinfolist = self.view.syncacheinfolist()
+
+    @inheritdoc(Strategy)
+    def process_event(self, time, receiver, content, log):
+        # get all required data
+        self.controller.start_session(time, receiver, content, log)
+        source = self.view.content_source(content)
+        path = self.view.shortest_path(receiver, source)
+        # incoming shared content request
+        if self.controller.broker_map(content):
+            #search broker table
+            """replicas = self.view.broker_lookup(content)
+            nearest_replica = min(replicas, key=lambda x: self.distance[receiver][x]) 
+            self.controller.forward_request_path(receiver, nearest_replica)
+            selectedr = self.controller.broker_get_replica(nearest_replica)
+            path = list(reversed(self.view.shortest_path(receiver, nearest_replica)))
+            for u, v in path_links(path):
+                self.controller.forward_content_hop(u, v)
+                if self.view.has_cache(v) and not self.view.cache_lookup(v, selectedr):
+                    self.controller.broker_put_replica(v, selectedr)
+            """
+            for u, v in path_links(path):
+                self.controller.forward_request_hop(u, v)
+                if self.view.has_cache(v):
+                    #if self.controller.get_content(v):
+                        #serving_node = v
+                        #break
+                    if self.view.broker_lookup(v) is not None:
+                        serving_node, replica = self.view.broker_lookup(v)
+                        self.controller.broker_get_replica(serving_node,replica)
+                        break
+                # No cache hits, get content from source
+                # following steps should be able to removed, since source nodes are
+                # already searched in previous step
+                #self.controller.get_content(v)
+                #serving_node = v
+            # Return content
+            path = list(reversed(self.view.shortest_path(receiver, serving_node)))
+            for u, v in path_links(path):
+                self.controller.forward_content_hop(u, v)
+                if self.view.has_cache(v):
+                    # insert content
+                    self.controller.put_content(v)
+
+        #normal request
+        else:
+            # Route requests to original source and queries caches on the path
+            for u, v in path_links(path):
+                self.controller.forward_request_hop(u, v)
+                if self.view.has_cache(v):
+                    if self.controller.get_content(v):
+                        serving_node = v
+                        break
+                # No cache hits, get content from source
+                self.controller.get_content(v)
+                serving_node = v
+            # Return content
+            path = list(reversed(self.view.shortest_path(receiver, serving_node)))
+            for u, v in path_links(path):
+                self.controller.forward_content_hop(u, v)
+                if self.view.has_cache(v):
+                    # insert content
+                    self.controller.put_content(v)
+
+        self.controller.end_session()
 
 @register_strategy('PROB_CACHE')
 class ProbCache(Strategy):

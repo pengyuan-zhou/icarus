@@ -17,7 +17,7 @@ import logging
 
 import networkx as nx
 import fnss
-
+from collections import OrderedDict
 from icarus.registry import CACHE_POLICY
 from icarus.util import path_links, iround
 from icarus.dumb import contentIDgap as gap
@@ -84,24 +84,22 @@ class NetworkView(object):
     def brokertablelist(self):
         """return list of all broker tables
         """
-        #return self.model.brokertablelist
-        for node in self.model.cache:
-            print(self.model.cache[node].dump())
-    def broker_lookup(self, origink):
+        return self.model.brokertablelist
+    def broker_lookup(self, v):
         """return locations of all mapped shared content
         s"""
-        i=0
-        k = origink
+        k = session['content']
         k = k % gap
-        loc = set()
-        while i<3:
-            k += i * gap
-            loc = loc.union(set(v for v in self.model.cache if self.model.cache[v].has(k)))
-            source = self.content_source(k)
-            if source:
-                loc.add(source)
-            i += 1
-        return loc 
+        for v,c in self.model.syncacheinfolist[v]:
+            i=0
+            while i<3:
+                k += i * gap
+                if k==c or isinstance(c,list) and k in c:
+                    loc=v
+                    replica=k
+                    return loc, replica 
+                i +=1
+        return None
         #Broker table------------------------------
 
     def content_locations(self, k):
@@ -347,6 +345,25 @@ class NetworkView(object):
         if node in self.model.cache:
             return self.model.cache[node].dump()
 
+    # can get node's sharecontent list via cache_dumpshare, or, brokertablelist
+    def cache_dumpshare(self, node):
+        """Returns the dump of the content of a cache in a specific node
+
+        Parameters
+        ----------
+        node : any hashable type
+            The node identifier
+
+        Returns
+        -------
+        dump : list
+            List of contents currently in the cache
+        """
+        if node in self.model.cache:
+            return self.model.cache[node].dumpshare()
+    def syncacheinfolist(self):
+
+        return self.model.syncacheinfolist
 
 class NetworkModel(object):
     """Models the internal state of the network.
@@ -381,6 +398,9 @@ class NetworkModel(object):
         # Network topology
         self.topology = topology
 
+        # convergence radius
+        self.radius = 3
+        self.distance = nx.all_pairs_dijkstra_path_length(self.topology, weight='delay')
         # Dictionary mapping each content object to its source
         # dict of location of contents keyed by content ID
         self.content_source = {}
@@ -425,9 +445,21 @@ class NetworkModel(object):
         self.cache = {node: CACHE_POLICY[policy_name](cache_size[node], **policy_args)
                           for node in cache_size}
         
-        #self.brokertablelist={self.cache[node] for node in list(self.cache.keys())}
-        self.brokertablelist=list(cache_size)#[list(self.cache.keys())[0]].dump()
-        print (self.brokertablelist)
+        # the list of sharecontent_caching of all caches
+        self.sharecontentlist=[ self.cache[node].dumpshare() for node in self.cache]
+        self.brokertablelist= dict(zip(self.cache.keys(),self.sharecontentlist))
+
+        # list of synchronizing_caching_nodes of knowledge for all caches sorted by distance
+        self.syncachelist= { node: sorted([c for c in self.cache.keys() if self.distance[node][c]<= self.radius], key=lambda c: self.distance[node][c]) for node in self.cache.keys() }
+        # the list of caching_contents of the synchronizing nodes of all caches sorted by distance
+        self.syncacheinfolist = { node: { c:self.cache[c].dumpshare()  for c in self.syncachelist[node] }  for node in self.cache.keys() }
+        # add source node into knowledge if it's in the radius
+        for node in self.syncacheinfolist.keys():
+            for s in self.source_node.keys():
+                if self.distance[node][s]<= self.radius:
+                    self.syncacheinfolist[node][s]=self.source_node[s]
+        
+        self.syncacheinfolist = {node:OrderedDict(sorted(self.syncacheinfolist[node].items(),key=lambda c: self.distance[node][c[0]])) for node in self.syncacheinfolist.keys()}
         # This is for a local un-coordinated cache (currently used only by
         # Hashrouting with edge cache)
         self.local_cache = {}
@@ -545,7 +577,7 @@ class NetworkController(object):
         if node in self.model.cache:
             return self.model.cache[node].put(replica)
 
-    def broker_get_replica(self, node):
+    #def broker_get_replica(self, node):
         """Get a shared content from a server or a cache.
 
         Parameters
@@ -558,7 +590,7 @@ class NetworkController(object):
         content : bool
             True if the content is available, False otherwise
         """
-        if self.session['content'] not in ss:
+        """if self.session['content'] not in ss:
             return False
         selectedr = self.session['content']
         selectedr = selectedr % gap
@@ -587,7 +619,7 @@ class NetworkController(object):
                         self.collector.server_hit(node)
                     return c
             return False
-
+     """
 
     def forward_request_path(self, s, t, path=None, main_path=True):
         """Forward a request from node *s* to node *t* over the provided path.
@@ -686,8 +718,32 @@ class NetworkController(object):
             The evicted object or *None* if no contents were evicted.
         """
         if node in self.model.cache:
+            if self.session['content'] in ss:
+                self.model.brokertablelist[node].append(self.session['content']) 
             return self.model.cache[node].put(self.session['content'])
     
+    def broker_get_replica(self, node, content):
+
+        if node in self.model.cache:
+            cache_hit = self.model.cache[node].get(content)
+            if cache_hit:
+                if self.session['log']:
+                    self.collector.cache_hit(node)
+            else:
+                if self.session['log']:
+                    self.collector.cache_miss(node)
+            return cache_hit
+        name, props = fnss.get_stack(self.model.topology, node)
+        if name == 'source' and content in props['contents']:
+            if self.collector is not None and self.session['log']:
+                self.collector.server_hit(node)
+            return True
+        else:
+            return False
+        
+
+
+
 
     def get_content(self, node):
         """Get a content from a server or a cache.

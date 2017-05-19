@@ -847,6 +847,7 @@ class LruCache(Cache):
     @inheritdoc(Cache)
     def __init__(self, maxlen, **kwargs):
         self._cache = LinkedSet()
+        self._cacheshare = LinkedSet() 
         self._maxlen = int(maxlen)
         if self._maxlen <= 0:
             raise ValueError('maxlen must be positive')
@@ -863,10 +864,11 @@ class LruCache(Cache):
     @inheritdoc(Cache)
     def dump(self):
         return list(iter(self._cache))
-
+    
+    #get share content list through updating if any change is made in self._cache
     @inheritdoc(Cache)
     def dumpshare(self):
-        return list(i for i in iter(self._cache) if i in ss)
+        return list(iter(self._cacheshare))
 
     def position(self, k, *args, **kwargs):
         """Return the current position of an item in the cache. Position *0*
@@ -901,6 +903,7 @@ class LruCache(Cache):
         if k not in self._cache:
             return False
         self._cache.move_to_top(k)
+        self._cacheshare = [ i for i in self._cache if i in ss] 
         return True
 
     def put(self, k, *args, **kwargs):
@@ -925,6 +928,7 @@ class LruCache(Cache):
             return None
         # if content not in cache append it on top
         self._cache.append_top(k)
+        self._cacheshare = [ i for i in self._cache if i in ss] 
         return self._cache.pop_bottom() if len(self._cache) > self._maxlen else None
 
     @inheritdoc(Cache)
@@ -932,11 +936,13 @@ class LruCache(Cache):
         if k not in self._cache:
             return False
         self._cache.remove(k)
+        self._cacheshare = [ i for i in self._cache if i in ss] 
         return True
 
     @inheritdoc(Cache)
     def clear(self):
         self._cache.clear()
+        self._cacheshare = [ i for i in self._cache if i in ss] 
 
 
 @register_cache_policy('SLRU')
