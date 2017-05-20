@@ -85,18 +85,20 @@ class NetworkView(object):
         """return list of all broker tables
         """
         return self.model.brokertablelist
-    def broker_lookup(self, v):
+    def broker_lookup(self, v, c):
         """return locations of all mapped shared content
         s"""
-        k = session['content']
+        k = c
         k = k % gap
-        for v,c in self.model.syncacheinfolist[v]:
+        for s,c in self.model.syncacheinfolist[v].items():
             i=0
             while i<3:
                 k += i * gap
-                if k==c or isinstance(c,list) and k in c:
-                    loc=v
+                if c==k or isinstance(c,list) and k in c:
+                    loc=s
                     replica=k
+                    if s is v:
+                        print (v,self.model.syncacheinfolist[v],k)
                     return loc, replica 
                 i +=1
         return None
@@ -575,6 +577,10 @@ class NetworkController(object):
             The evicted object or *None* if no contents were evicted.
         """
         if node in self.model.cache:
+            for Pnode in self.model.syncacheinfolist.keys():
+                if  node in self.model.syncacheinfolist[Pnode]:
+                    self.model.syncacheinfolist[Pnode][node].append(replica)
+                    #print (self.model.syncacheinfolist[Pnode][node])
             return self.model.cache[node].put(replica)
 
     #def broker_get_replica(self, node):
@@ -719,7 +725,10 @@ class NetworkController(object):
         """
         if node in self.model.cache:
             if self.session['content'] in ss:
-                self.model.brokertablelist[node].append(self.session['content']) 
+                for Pnode in self.model.syncacheinfolist.keys():
+                    if  node in self.model.syncacheinfolist[Pnode]:
+                        self.model.syncacheinfolist[Pnode][node].append(self.session['content'])
+                        #print (self.model.syncacheinfolist[Pnode][node])
             return self.model.cache[node].put(self.session['content'])
     
     def broker_get_replica(self, node, content):

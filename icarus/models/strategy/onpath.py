@@ -287,28 +287,43 @@ class BrokerAssisted(Strategy):
                 if self.view.has_cache(v) and not self.view.cache_lookup(v, selectedr):
                     self.controller.broker_put_replica(v, selectedr)
             """
+            replica = None
             for u, v in path_links(path):
                 self.controller.forward_request_hop(u, v)
                 if self.view.has_cache(v):
                     #if self.controller.get_content(v):
                         #serving_node = v
                         #break
-                    if self.view.broker_lookup(v) is not None:
-                        serving_node, replica = self.view.broker_lookup(v)
-                        self.controller.broker_get_replica(serving_node,replica)
+                    if self.view.broker_lookup(v, content) is not None:
+                        serving_node, replica = self.view.broker_lookup(v,content)
+                        if serving_node is v:
+                            self.controller.broker_get_replica(v,replica)
+                        else:
+                            path = self.view.shortest_path(v, serving_node)
+                            print (path)
+                            for x, y in path_links(path):
+                                self.controller.forward_request_hop(x, y)
+                                if y is serving_node:
+                                    self.controller.broker_get_replica(y,replica)
+                                    #print (y,serving_node, replica)
                         break
+            else:
                 # No cache hits, get content from source
                 # following steps should be able to removed, since source nodes are
                 # already searched in previous step
-                #self.controller.get_content(v)
-                #serving_node = v
+                self.controller.get_content(v)
+                serving_node = v
+            #print (serving_node)
             # Return content
             path = list(reversed(self.view.shortest_path(receiver, serving_node)))
             for u, v in path_links(path):
                 self.controller.forward_content_hop(u, v)
                 if self.view.has_cache(v):
                     # insert content
-                    self.controller.put_content(v)
+                    if replica:
+                        self.controller.broker_put_replica(v, replica)
+                    else:
+                        self.controller.put_content(v)
 
         #normal request
         else:

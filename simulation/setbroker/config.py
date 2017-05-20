@@ -54,18 +54,18 @@ ALPHA = [1.0]
 #NETWORK_CACHE = [0.001, 0.005, 0.01,0.015,0.02,0.025,0.03,0.035,0.04]#, 0.005, 0.01,0.015,0.02,0.025,0.03,0.035,0.04]
 NETWORK_CACHE = [0.1]
 # Number of content objects
-N_CONTENTS = 1*10**5
+N_CONTENTS = 1*10**3
 
 # Number of requests per second (over the whole network)
 NETWORK_REQUEST_RATE = 12.0
 
 # Number of content requests generated to prepopulate the caches
 # These requests are not logged
-N_WARMUP_REQUESTS = 3*10**5
+N_WARMUP_REQUESTS = 3*10**4
 
 # Number of content requests generated after the warmup and logged
 # to generate results. 
-N_MEASURED_REQUESTS = 6*10**5
+N_MEASURED_REQUESTS = 6*10**4
 
 # List of all implemented topologies
 # Topology implementations are located in ./icarus/scenarios/topology.py
