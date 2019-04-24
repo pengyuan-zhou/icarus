@@ -3,5 +3,5 @@
 from icarus.scenarios.algorithms import *
 from .cacheplacement import *
 from .contentplacement import *
-from .topology import *
+from .topology_multi import *
 from .workload import *

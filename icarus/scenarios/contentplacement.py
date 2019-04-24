@@ -60,13 +60,13 @@ def ases_content_placement(topology, asns, rank_sum, contents, seed=None):
     receiverlist = get_receivers(topology)
     receiverlist.sort()
     receiverlistas = [None] * len(asns)
-    receiverlistas = [[j for j in receiverlist if ('S%d' % i) in j] for i in range(len(asns))]
+    receiverlistas = [[j for j in receiverlist if ('rec_%d' % i) in j] for i in range(len(asns))]
     numReceiver = sum(len(receiver) for receiver in receiverlistas) 
     sourcelist = get_sources(topology)
     sourcelist.sort()
     sourcelistas = [None] * len(asns)
     # divide source nodes by AS
-    sourcelistas = [[j for j in sourcelist if ('S%d' % i) in j] for i in range(len(asns))]
+    sourcelistas = [[j for j in sourcelist if ('src_%d' % i) in j] for i in range(len(asns))]
     numSource = sum(len(source) for source in sourcelistas) 
     content_placement = collections.defaultdict(set)
     # problem1.solved, because number of source node which is proportional to AS size, is also proportional to nubmer of users

@@ -225,7 +225,7 @@ def topology_ring(n, delay_int=1, delay_ext=5, **kwargs):
     return IcnTopology(topology)
 
 @register_topology_factory('MIDDLETHREETIER')
-def topology_middlethreetier(n_core=3, n_aggregation=5, n_edge=15, n_hosts=50):
+def topology_threetier(n_core=3, n_aggregation=5, n_edge=15, n_hosts=50):
     """
     Return a three-tier data center topology.
 
@@ -272,7 +272,7 @@ def topology_middlethreetier(n_core=3, n_aggregation=5, n_edge=15, n_hosts=50):
         raise ValueError('n_core, n_aggregation, n_edge and n_host '\
                          'must be positive')
     """
-    topo = DatacenterTopology(nx.complete_bipartite_graph(n_core, n_aggregation))
+    topo = fnss.DatacenterTopology(nx.complete_bipartite_graph(n_core, n_aggregation))
     #topo.name = "three_tier_topology(%d,%d,%d,%d)" % (n_core, n_aggregation,n_edge, n_hosts)
     #topo.graph['type'] = 'three_tier'
     #core-datastore-0,1,2
@@ -321,38 +321,38 @@ def topology_middlethreetier(n_core=3, n_aggregation=5, n_edge=15, n_hosts=50):
     
 
     #----------------nodes--------------#
-    publishers = [v for v in topology.nodes_iter()
-        if topology.node[v]['tier'] == 'core']
+    publishers = [v for v in topo.nodes_iter()
+        if topo.node[v]['tier'] == 'core']
 
-    reflectors = [v for v in topology.nodes_iter()
-        if topology.node[v]['tier'] == 'aggregation']
+    reflectors = [v for v in topo.nodes_iter()
+        if topo.node[v]['tier'] == 'aggregation']
 
-    edges = [v for v in topology.nodes_iter()
-        if topology.node[v]['tier'] == 'edge']
+    edges = [v for v in topo.nodes_iter()
+        if topo.node[v]['tier'] == 'edge']
 
-    users = [v for v in topology.nodes_iter() 
-        if topology.node[v]['tier'] == 'host']
+    users = [v for v in topo.nodes_iter() 
+        if topo.node[v]['tier'] == 'host']
 
-    for u, v in topology.edges_iter():
+    for u, v in topo.edges_iter():
         if u in users or v in users:
-            topology.edge[u][v]['type'] = 'internal'
-            fnss.set_delays_constant(topology, INTERNAL_LINK_DELAY, 'ms', [(u, v)])
+            topo.edge[u][v]['type'] = 'internal'
+            fnss.set_delays_constant(topo, INTERNAL_LINK_DELAY, 'ms', [(u, v)])
         else:
-            topology.edge[u][v]['type'] = 'external'
-            fnss.set_delays_constant(topology, EXTERNAL_LINK_DELAY, 'ms', [(u, v)])
-    fnss.set_weights_constant(topology, 1.0)
+            topo.edge[u][v]['type'] = 'external'
+            fnss.set_delays_constant(topo, EXTERNAL_LINK_DELAY, 'ms', [(u, v)])
+    fnss.set_weights_constant(topo, 1.0)
 
     # Deploy stacks
-    cachenodes =  [v for v in topology.nodes() if v in reflectors +  edges] 
-    topology.graph['icr_candidates'] = set(cachenodes)
+    cachenodes =  [v for v in topo.nodes() if v in reflectors +  edges] 
+    topo.graph['icr_candidates'] = set(cachenodes)
     for v in publishers:
-        fnss.add_stack(topology, v, 'publisher')
+        fnss.add_stack(topo, v, 'publisher')
     for v in users:
-        fnss.add_stack(topology, v, 'user')
+        fnss.add_stack(topo, v, 'user')
     for v in reflectors:
-        fnss.add_stack(topology, v, 'reflector')
+        fnss.add_stack(topo, v, 'reflector')
     for v in edges:
-        fnss.add_stack(topology, v, 'edge')
+        fnss.add_stack(topo, v, 'edge')
 
     return topo
 

@@ -97,8 +97,8 @@ class NetworkView(object):
                 if c==k or isinstance(c,list) and k in c:
                     loc=s
                     replica=k
-                    if s is v:
-                        print (v,self.model.syncacheinfolist[v],k)
+                    #if s is v:
+                        #print (v,self.model.syncacheinfolist[v],k)
                     return loc, replica 
                 i +=1
         return None

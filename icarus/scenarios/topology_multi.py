@@ -182,7 +182,6 @@ def topology_multi_as(asns, source_ratio=0.1, ext_delay=EXTERNAL_LINK_DELAY, **k
             fnss.add_stack(topo_multiAS, v, 'receiver')
         for v in routerslistsort[j]:
             fnss.add_stack(topo_multiAS, v, 'router')
-        
     return IcnTopology(topo_multiAS)
 
 def mapping(x):

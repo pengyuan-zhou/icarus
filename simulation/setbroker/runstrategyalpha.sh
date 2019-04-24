@@ -16,22 +16,22 @@ ICARUS_DIR=${CURR_DIR}/../..
 # Dir where plots will be saved 
 plots_folder="plots".$current_time
 PLOTS_DIR=${CURR_DIR}/$plots_folder
-#mkdir $PLOTS_DIR
+mkdir $PLOTS_DIR
 
 # Config file
 CONFIG_FILE=${CURR_DIR}/configalpha.py
 
 # FIle where results will be saved
-#RESULTS_FILE=${CURR_DIR}/results.$current_time.pickle
-RESULTS_FILE=${CURR_DIR}/results.2017.05.08-01.21.01.pickle
-#touch $RESULTS_FILE
+RESULTS_FILE=${CURR_DIR}/results.$current_time.pickle
+#RESULTS_FILE=${CURR_DIR}/results.2017.05.08-01.21.01.pickle
+touch $RESULTS_FILE
 
 # Add Icarus code to PYTHONPATH
 export PYTHONPATH=${ICARUS_DIR}:$PYTHONPATH
 
 # Run experiments
-#echo "Run experiments"
-#python ${ICARUS_DIR}/icarus.py --results ${RESULTS_FILE} ${CONFIG_FILE}
+echo "Run experiments"
+python ${ICARUS_DIR}/icarus.py --results ${RESULTS_FILE} ${CONFIG_FILE}
 
 # Plot results
 echo "Plot results"
