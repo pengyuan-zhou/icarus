@@ -96,14 +96,15 @@ STRATEGIES = [
      #'HR_SYMM',         # Symmetric hash-routing
      #'HR_ASYMM',        # Asymmetric hash-routing
      #'HR_MULTICAST',    # Multicast hash-routing
-     #'HR_HYBRID_AM',    # Hybrid Asymm-Multicast hash-routing
+     'HR_HYBRID_AM',    # Hybrid Asymm-Multicast hash-routing
      'HR_HYBRID_SM',    # Hybrid Symm-Multicast hash-routing
      'CL4M',            # Cache less for more
      'PROB_CACHE',      # ProbCache
      'LCD',             # Leave Copy Down
      #'NRR',     # Random choice: cache in one random cache on path
-     #'RAND_BERNOULLI',  # Random Bernoulli: cache randomly in caches on path
-     'BROKER_ASSISTED'
+     'RAND_BERNOULLI',  # Random Bernoulli: cache randomly in caches on path
+     'BROKER_ASSISTED'#,
+     #'BROKER_ASSISTED_IDEAL'
              ]
 
 # Cache replacement policy used by the network caches.

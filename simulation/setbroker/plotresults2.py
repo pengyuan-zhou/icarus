@@ -52,13 +52,14 @@ STRATEGY_STYLE = {
          'HR_HYBRID_SM':    'm-v',
          'LCE':             'b--<',
          'LCD':             'b-->',
-         'CL4M':            'm-->',
-         'PROB_CACHE':      'c--<',
+         'CL4M':            'g-->',
+         'PROB_CACHE':      'k--<',
          'RAND_CHOICE':     'r--<',
-         'RAND_BERNOULLI':  'g--*',
+         'RAND_BERNOULLI':  'y--*',
          'NO_CACHE':        'k:o',
          'EDGE':         'k-o',
-         'BROKER_ASSISTED':  'b-*',
+         'BROKER_ASSISTED':  'r-D',
+         'BROKER_ASSISTED_IDEAL':  'w:',
          'NRR':          'k-<'
                 }
 
@@ -78,6 +79,7 @@ STRATEGY_LEGEND = {
          'NO_CACHE':        'No caching',
          'EDGE':         'Edge',
          'BROKER_ASSISTED':    'BROKER_ASSISTED',
+         #'BROKER_ASSISTED_IDEAL':    'BROKER_ASSISTED IDEAL',
          'NRR':          'NRR'
                     }
 
@@ -115,7 +117,7 @@ def plot_cache_hits_vs_alpha(resultset, topology, cache_size, alpha_range, strat
     desc['ycondnames'] = [('strategy', 'name')]*len(strategies)
     desc['ycondvals'] = strategies
     desc['errorbar'] = True
-    #desc['legend_loc'] = 'upper left'
+    desc['legend_loc'] = 'upper left'
     desc['legend_loc'] = LOC
     desc['line_style'] = STRATEGY_STYLE
     desc['legend'] = STRATEGY_LEGEND
@@ -160,7 +162,7 @@ def plot_link_load_vs_cache_size_diffsharedset(resultset, topology, alpha, cache
     desc['ycondvals'] = sharedsets
     desc['errorbar'] = True
     #desc['legend_loc'] = 'upper right'
-    desc['legend_loc'] = LOC
+    #desc['legend_loc'] = LOC
     #desc['line_style'] = STRATEGY_STYLE
     #desc['legend'] = STRATEGY_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
@@ -169,8 +171,8 @@ def plot_link_load_vs_cache_size_diffsharedset(resultset, topology, alpha, cache
 
 def plot_cache_hits_vs_cache_size_diffsharedset(resultset, topology, alpha, cache_size_range, sharedsets, plotdir):
     desc = {}
-    if 'NO_CACHE' in strategies:
-        strategies.remove('NO_CACHE')
+    #if 'NO_CACHE' in strategies:
+        #strategies.remove('NO_CACHE')
     desc['title'] = 'Cache hit ratio: T=%s A=%s' % (topology, alpha)
     desc['xlabel'] = 'Shared set content population'
     desc['ylabel'] = 'Cache hit ratio'
@@ -183,7 +185,7 @@ def plot_cache_hits_vs_cache_size_diffsharedset(resultset, topology, alpha, cach
     desc['ycondnames'] = [('Sharedset','set')]*len(sharedsets)
     desc['ycondvals'] = sharedsets
     desc['errorbar'] = True
-    desc['legend_loc'] = 'upper left'
+    #desc['legend_loc'] = 'upper left'
     #desc['line_style'] = SET_STYLE
     #desc['legend'] = SET_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
@@ -194,7 +196,7 @@ def plot_cache_hits_vs_cache_size(resultset, topology, alpha, cache_size_range, 
     desc = {}
     if 'NO_CACHE' in strategies:
         strategies.remove('NO_CACHE')
-    desc['title'] = 'Cache hit ratio: T=%s A=%s' % (topology, alpha)
+    #desc['title'] = 'Cache hit ratio: T=%s A=%s' % (topology, alpha)
     desc['xlabel'] = u'Cache to population ratio'
     desc['ylabel'] = 'Cache hit ratio'
     #desc['xscale'] = 'log'
@@ -206,9 +208,9 @@ def plot_cache_hits_vs_cache_size(resultset, topology, alpha, cache_size_range, 
     desc['ycondnames'] = [('strategy', 'name')]*len(strategies)
     desc['ycondvals'] = strategies
     desc['errorbar'] = True
-    #desc['legend_loc'] = 'upper left'
+    desc['legend_loc'] = 'upper left'
     desc['line_style'] = STRATEGY_STYLE
-    #desc['legend'] = STRATEGY_LEGEND
+    desc['legend'] = STRATEGY_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
     plot_lines(resultset, desc,'CACHE_HIT_RATIO_T=%s@A=%s.pdf'
                % (topology, alpha), plotdir)
@@ -216,7 +218,7 @@ def plot_cache_hits_vs_cache_size(resultset, topology, alpha, cache_size_range, 
 
 def plot_link_load_vs_alpha(resultset, topology, cache_size, alpha_range, strategies, plotdir):
     desc = {}
-    desc['title'] = 'Internal link load: T=%s C=%s' % (topology, cache_size)
+    #desc['title'] = 'Internal link load: T=%s C=%s' % (topology, cache_size)
     desc['xlabel'] = u'Content distribution $\u03b1$'
     desc['ylabel'] = 'Internal link load'
     desc['xparam'] = ('workload', 'alpha')
@@ -227,7 +229,7 @@ def plot_link_load_vs_alpha(resultset, topology, cache_size, alpha_range, strate
     desc['ycondnames'] = [('strategy', 'name')]*len(strategies)
     desc['ycondvals'] = strategies
     desc['errorbar'] = True
-    #desc['legend_loc'] = 'upper center'
+    desc['legend_loc'] = 'upper center'
     desc['legend_loc'] = LOC
     desc['line_style'] = STRATEGY_STYLE
     desc['legend'] = STRATEGY_LEGEND
@@ -238,7 +240,7 @@ def plot_link_load_vs_alpha(resultset, topology, cache_size, alpha_range, strate
 
 def plot_link_load_vs_cache_size(resultset, topology, alpha, cache_size_range, strategies, plotdir):
     desc = {}
-    desc['title'] = 'Internal link load: T=%s A=%s' % (topology, alpha)
+    #desc['title'] = 'Internal link load: T=%s A=%s' % (topology, alpha)
     desc['xlabel'] = 'Cache to population ratio'
     desc['ylabel'] = 'Internal link load'
     #desc['xscale'] = 'log'
@@ -250,10 +252,10 @@ def plot_link_load_vs_cache_size(resultset, topology, alpha, cache_size_range, s
     desc['ycondnames'] = [('strategy', 'name')]*len(strategies)
     desc['ycondvals'] = strategies
     desc['errorbar'] = True
-    #desc['legend_loc'] = 'upper right'
+    desc['legend_loc'] = 'upper right'
     desc['legend_loc'] = LOC
     desc['line_style'] = STRATEGY_STYLE
-    #desc['legend'] = STRATEGY_LEGEND
+    desc['legend'] = STRATEGY_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
     plot_lines(resultset, desc, 'LINK_LOAD_INTERNAL_T=%s@A=%s.pdf'
                % (topology, alpha), plotdir)
@@ -261,7 +263,7 @@ def plot_link_load_vs_cache_size(resultset, topology, alpha, cache_size_range, s
 
 def plot_latency_vs_alpha(resultset, topology, cache_size, alpha_range, strategies, plotdir):
     desc = {}
-    desc['title'] = 'Latency: T=%s C=%s' % (topology, cache_size)
+    #desc['title'] = 'Latency: T=%s C=%s' % (topology, cache_size)
     desc['xlabel'] = u'Content distribution $\u03b1$'
     desc['ylabel'] = 'Latency (ms)'
     desc['xparam'] = ('workload', 'alpha')
@@ -272,7 +274,7 @@ def plot_latency_vs_alpha(resultset, topology, cache_size, alpha_range, strategi
     desc['ycondnames'] = [('strategy', 'name')]*len(strategies)
     desc['ycondvals'] = strategies
     desc['errorbar'] = True
-    #desc['legend_loc'] = 'upper center'
+    desc['legend_loc'] = 'upper center'
     desc['legend_loc'] = LOC
     desc['line_style'] = STRATEGY_STYLE
     desc['legend'] = STRATEGY_LEGEND
@@ -296,9 +298,9 @@ def plot_latency_vs_cache_size(resultset, topology, alpha, cache_size_range, str
     desc['ycondvals'] = strategies
     desc['metric'] = ('LATENCY', 'MEAN')
     desc['errorbar'] = True
-    #desc['legend_loc'] = 'upper right'
+    desc['legend_loc'] = 'upper right'
     desc['line_style'] = STRATEGY_STYLE
-    #desc['legend'] = STRATEGY_LEGEND
+    desc['legend'] = STRATEGY_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
     plot_lines(resultset, desc, 'LATENCY_T=%s@A=%s.pdf'
                % (topology, alpha), plotdir)
@@ -388,10 +390,11 @@ def run(config, results, plotdir):
     cache_sizes = settings.NETWORK_CACHE
     alphas = settings.ALPHA
     strategies = settings.STRATEGIES
+    sharedsets= settings.SHAREDSET
     # Plot graphs
     for topology in topologies:
         for cache_size in cache_sizes:
-            if cache_size==0.001:
+            if cache_size==0.01:
                 logger.info('Plotting cache hit ratio for topology %s and cache size %s vs alpha' % (topology, str(cache_size)))
                 plot_cache_hits_vs_alpha(resultset, topology, cache_size, alphas, strategies, plotdir)
                 logger.info('Plotting link load for topology %s vs cache size %s' % (topology, str(cache_size)))
@@ -405,17 +408,17 @@ def run(config, results, plotdir):
                 logger.info('Plotting cache hit ratio for topology %s and alpha %s vs cache size' % (topology, str(alpha)))
                 plot_cache_hits_vs_cache_size(resultset, topology, alpha, cache_sizes, strategies, plotdir)
                 
-                #plot_cache_hits_vs_cache_size_diffsharedset(resultset, topology, alpha, cache_sizes, sharedsets, plotdir)
+                plot_cache_hits_vs_cache_size_diffsharedset(resultset, topology, alpha, cache_sizes, sharedsets, plotdir)
                 
                 logger.info('Plotting link load for topology %s and alpha %s vs cache size' % (topology, str(alpha)))
                 plot_link_load_vs_cache_size(resultset, topology, alpha, cache_sizes, strategies, plotdir)
                 
-                #plot_link_load_vs_cache_size_diffsharedset(resultset, topology, alpha, cache_sizes, sharedsets, plotdir)
+                plot_link_load_vs_cache_size_diffsharedset(resultset, topology, alpha, cache_sizes, sharedsets, plotdir)
                 
                 logger.info('Plotting latency for topology %s and alpha %s vs cache size' % (topology, str(alpha)))
                 plot_latency_vs_cache_size(resultset, topology, alpha, cache_sizes, strategies, plotdir)
                 
-                #plot_latency_vs_cache_size_diffsharedset(resultset, topology, alpha, cache_sizes, sharedsets, plotdir)
+                plot_latency_vs_cache_size_diffsharedset(resultset, topology, alpha, cache_sizes, sharedsets, plotdir)
     
     """ 
     for cache_size in cache_sizes:
