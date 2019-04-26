@@ -54,25 +54,25 @@ ALPHA = [1.0]
 NETWORK_CACHE = [0.01,0.02,0.03,0.04, 0.05]#, 0.005, 0.01,0.015,0.02,0.025,0.03,0.035,0.04]
 #NETWORK_CACHE = [0.001]
 # Number of content objects
-N_CONTENTS = 1*10**4
+N_CONTENTS = 1*10**5
 
 # Number of requests per second (over the whole network)
-NETWORK_REQUEST_RATE = 12.0
+NETWORK_REQUEST_RATE = 250.0
 
 # Number of content requests generated to prepopulate the caches
 # These requests are not logged
-N_WARMUP_REQUESTS = 3*10**4
+N_WARMUP_REQUESTS = 3*10**5
 
 # Number of content requests generated after the warmup and logged
 # to generate results. 
-N_MEASURED_REQUESTS = 6*10**4
+N_MEASURED_REQUESTS = 6*10**5
 
 i=0
-SHAREDSET= [None]*3
-while i<3:
-    SHAREDSET[i]= range(1,1+1000*(i+1))
-    SHAREDSET[i].extend(range(10001,10001+1000*(i+1)))
-    SHAREDSET[i].extend(range(20001,20001+1000*(i+1)))
+SHAREDSET= [None]*1
+while i<1:
+    SHAREDSET[i]= range(1,1+10000*(i+1))
+    SHAREDSET[i].extend(range(100001,100001+10000*(i+1)))
+    SHAREDSET[i].extend(range(200001,200001+10000*(i+1)))
     print (len(SHAREDSET[i]))
     i+=1
 # List of all implemented topologies
@@ -86,7 +86,8 @@ TOPOLOGIES =  [
 #          'MIDDLETHREETIER' 
               ]
 
-ASNS = [1221,1755,3967]
+#ASNS = [1221,1755,3967]
+ASNS = [1239,3257,6461]
 
 # List of caching and routing strategies
 # The code is located in ./icarus/models/strategy.py
@@ -101,10 +102,10 @@ STRATEGIES = [
      'CL4M',            # Cache less for more
      'PROB_CACHE',      # ProbCache
      'LCD',             # Leave Copy Down
-     #'NRR',     # Random choice: cache in one random cache on path
+     'NRR',     # Random choice: cache in one random cache on path
      'RAND_BERNOULLI',  # Random Bernoulli: cache randomly in caches on path
-     'BROKER_ASSISTED'
-     #'BROKER_ASSISTED_IDEAL'
+     'BROKER_ASSISTED',
+     'BROKER_ASSISTED_IDEAL'
              ]
 
 # Cache replacement policy used by the network caches.

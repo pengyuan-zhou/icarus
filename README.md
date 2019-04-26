@@ -23,3 +23,6 @@ https://github.com/zpymyyn/icarus/tree/ICNbroker
 
 
 Built on Icarus: https://github.com/icarus-sim/icarus
+
+
+If sharedset is changed, ./icarus/dumb.py also needs to change.

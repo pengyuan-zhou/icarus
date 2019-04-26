@@ -59,14 +59,14 @@ STRATEGY_STYLE = {
          'NO_CACHE':        'k:o',
          'EDGE':         'k-o',
          'BROKER_ASSISTED':  'r-D',
-         'BROKER_ASSISTED_IDEAL':  'w:',
+         'BROKER_ASSISTED_IDEAL':  'r-o',
          'NRR':          'k-<'
                 }
 
 # This dict maps name of strategies to names to be displayed in the legend
 STRATEGY_LEGEND = {
          'LCE':             'LCE',
-         'LCD':             'LCD',
+         'LCD':             '',
          'HR_SYMM':         'HR Symm',
          'HR_ASYMM':        'HR Asymm',
          'HR_MULTICAST':    'HR Multicast',         
@@ -79,7 +79,7 @@ STRATEGY_LEGEND = {
          'NO_CACHE':        'No caching',
          'EDGE':         'Edge',
          'BROKER_ASSISTED':    'BROKER_ASSISTED',
-         #'BROKER_ASSISTED_IDEAL':    'BROKER_ASSISTED IDEAL',
+         'BROKER_ASSISTED_IDEAL':    'BROKER_ASSISTED IDEAL',
          'NRR':          'NRR'
                     }
 
@@ -408,17 +408,17 @@ def run(config, results, plotdir):
                 logger.info('Plotting cache hit ratio for topology %s and alpha %s vs cache size' % (topology, str(alpha)))
                 plot_cache_hits_vs_cache_size(resultset, topology, alpha, cache_sizes, strategies, plotdir)
                 
-                plot_cache_hits_vs_cache_size_diffsharedset(resultset, topology, alpha, cache_sizes, sharedsets, plotdir)
+                #plot_cache_hits_vs_cache_size_diffsharedset(resultset, topology, alpha, cache_sizes, sharedsets, plotdir)
                 
                 logger.info('Plotting link load for topology %s and alpha %s vs cache size' % (topology, str(alpha)))
                 plot_link_load_vs_cache_size(resultset, topology, alpha, cache_sizes, strategies, plotdir)
                 
-                plot_link_load_vs_cache_size_diffsharedset(resultset, topology, alpha, cache_sizes, sharedsets, plotdir)
+                #plot_link_load_vs_cache_size_diffsharedset(resultset, topology, alpha, cache_sizes, sharedsets, plotdir)
                 
                 logger.info('Plotting latency for topology %s and alpha %s vs cache size' % (topology, str(alpha)))
                 plot_latency_vs_cache_size(resultset, topology, alpha, cache_sizes, strategies, plotdir)
                 
-                plot_latency_vs_cache_size_diffsharedset(resultset, topology, alpha, cache_sizes, sharedsets, plotdir)
+                #plot_latency_vs_cache_size_diffsharedset(resultset, topology, alpha, cache_sizes, sharedsets, plotdir)
     
     """ 
     for cache_size in cache_sizes:
