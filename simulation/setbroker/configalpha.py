@@ -30,7 +30,7 @@ RESULTS_FORMAT = 'PICKLE'
 
 # Number of times each experiment is replicated
 # This is necessary for extracting confidence interval of selected metrics
-N_REPLICATIONS = 10
+N_REPLICATIONS = 20
 
 # List of metrics to be measured in the experiments
 # The implementation of data collectors are located in ./icaurs/execution/collectors.py
@@ -48,20 +48,20 @@ DATA_COLLECTORS = ['CACHE_HIT_RATIO', 'LATENCY', 'LINK_LOAD', 'PATH_STRETCH']
 # This would give problems while trying to plot the results because if for
 # example I wanted to filter experiment with alpha=0.8, experiments with
 # alpha = 0.799999999999 would not be recognized 
-ALPHA = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2]
+ALPHA = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2]
 #ALPHA = [1.0]
 # Total size of network cache as a fraction of content population
 #NETWORK_CACHE = [0.001, 0.005, 0.01,0.015,0.02,0.025,0.03,0.035,0.04]#, 0.005, 0.01,0.015,0.02,0.025,0.03,0.035,0.04]
 NETWORK_CACHE = [0.01]
 # Number of content objects
-N_CONTENTS = 1*10**5
+N_CONTENTS = 1*10**4
 
 # Number of requests per second (over the whole network)
 NETWORK_REQUEST_RATE = 250.0
 
 # Number of content requests generated to prepopulate the caches
 # These requests are not logged
-N_WARMUP_REQUESTS = 3*10**5
+N_WARMUP_REQUESTS = 3*10**4
 
 # Number of content requests generated after the warmup and logged
 # to generate results. 
@@ -70,9 +70,9 @@ N_MEASURED_REQUESTS = 6*10**5
 i=0
 SHAREDSET= [None]*1
 while i<1:
-    SHAREDSET[i]= range(1,1+10000*(i+1))
-    SHAREDSET[i].extend(range(100001,100001+10000*(i+1)))
-    SHAREDSET[i].extend(range(200001,200001+10000*(i+1)))
+    SHAREDSET[i]= range(1,1+1000*(i+1))
+    SHAREDSET[i].extend(range(10001,10001+1000*(i+1)))
+    SHAREDSET[i].extend(range(20001,20001+1000*(i+1)))
     print (len(SHAREDSET[i]))
     i+=1
 
@@ -96,15 +96,18 @@ STRATEGIES = [
      #'HR_SYMM',         # Symmetric hash-routing
      #'HR_ASYMM',        # Asymmetric hash-routing
      #'HR_MULTICAST',    # Multicast hash-routing
-     'HR_HYBRID_AM',    # Hybrid Asymm-Multicast hash-routing
-     'HR_HYBRID_SM',    # Hybrid Symm-Multicast hash-routing
+     #'HR_HYBRID_AM',    # Hybrid Asymm-Multicast hash-routing
+     #'HR_HYBRID_SM',    # Hybrid Symm-Multicast hash-routing
+     #'BROKER_HR_HYBRID_SM',    # Hybrid Symm-Multicast hash-routing
      'CL4M',            # Cache less for more
+     'BROKER_CL4M',            # Cache less for more
      'PROB_CACHE',      # ProbCache
-     'LCD',             # Leave Copy Down
-     'NRR',     # Random choice: cache in one random cache on path
-     'RAND_BERNOULLI',  # Random Bernoulli: cache randomly in caches on path
-     'BROKER_ASSISTED',
-     'BROKER_ASSISTED_IDEAL'
+     'BROKER_PROB_CACHE',      # ProbCache
+     #'LCD',             # Leave Copy Down
+     #'BROKER_LCD',             # Leave Copy Down
+     #'NRR',     # Random choice: cache in one random cache on path
+     #'RAND_BERNOULLI',  # Random Bernoulli: cache randomly in caches on path
+     #'BROKER_ASSISTED_IDEAL'
              ]
 
 # Cache replacement policy used by the network caches.

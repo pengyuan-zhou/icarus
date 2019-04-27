@@ -93,10 +93,10 @@ class NetworkView(object):
         for s,c in self.model.syncacheinfolist[v].items():
             i=0
             while i<3:
-                k += i * gap
-                if c==k or isinstance(c,list) and k in c:
+                kb = k + i * gap
+                if c==kb or isinstance(c,list) and kb in c:
                     loc=s
-                    replica=k
+                    replica=kb
                     #if s is v:
                         #print (v,self.model.syncacheinfolist[v],k)
                     return loc, replica 
@@ -751,6 +751,43 @@ class NetworkController(object):
             return False
         
 
+    def get_replica(self, node):
+        """Get a replica of content regardless of provider from a server or a cache.
+
+        Parameters
+        ----------
+        node : any hashable type
+            The node where the content is retrieved
+
+        Returns
+        -------
+        replica : bool
+            True if the content is available, False otherwise
+        """
+        content_origin = self.session['content']
+        value_overlap = content_origin % gap  
+        content1 = value_overlap
+        content2 = value_overlap+  gap
+        content3 = value_overlap+ 2* gap
+        if node in self.model.cache:
+            cache_hit1 = self.model.cache[node].get(content1)
+            cache_hit2 = self.model.cache[node].get(content2)
+            cache_hit3 = self.model.cache[node].get(content3)
+            cache_hit = cache_hit1 or cache_hit2 or cache_hit3
+            if cache_hit:
+                if self.session['log']:
+                    self.collector.cache_hit(node)
+            else:
+                if self.session['log']:
+                    self.collector.cache_miss(node)
+            return cache_hit
+        name, props = fnss.get_stack(self.model.topology, node)
+        if name == 'source' and self.session['content'] in props['contents']:
+            if self.collector is not None and self.session['log']:
+                self.collector.server_hit(node)
+            return True
+        else:
+            return False
 
 
 
