@@ -12,25 +12,25 @@ The major objectives that we are looking into are:
 
 3) Reduction in network delay to computation when sharing within a group vs, when retrieving from a data store
 
-?3) is same with 1)? 
-
-4) [?] Effect of memberships to a group. i.e. how much does sharing change when a node is part of one group vs. multiple groups. (Measuring effects on local cache hit ratio and sharing frequency).
-
 not done yet
 
-#files location
+* files location
 configure files in ./simulation/set1/
 
-#Run Simulation:
+
+* result location
+./simulation/set1/plots..../
+
+
+* Run Simulation:
 sh ./simulation/set1/run.sh
 
-#more detail
+* more detail
 please read ./simulation/set1/README.md
 
 
-#possible further update:
-https://github.com/zpymyyn/icarus/tree/Mecomm17
+* publication:
+```
+Nitinder Mohan, Pengyuan Zhou, Keerthana Govindaraj, and Jussi Kangasharju. 2017. Managing Data in Computational Edge Clouds. In Proceedings of the Workshop on Mobile Edge Communications (MECOMM ’17). Association for Computing Machinery, New York, NY, USA, 19–24. DOI:https://doi.org/10.1145/3098208.3098212
+```
 
-
-
-Built on Icarus: https://github.com/icarus-sim/icarus
