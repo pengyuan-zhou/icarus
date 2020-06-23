@@ -31,6 +31,10 @@ please read ./simulation/set1/README.md
 
 * publication:
 ```
-Nitinder Mohan, Pengyuan Zhou, Keerthana Govindaraj, and Jussi Kangasharju. 2017. Managing Data in Computational Edge Clouds. In Proceedings of the Workshop on Mobile Edge Communications (MECOMM ’17). Association for Computing Machinery, New York, NY, USA, 19–24. DOI:https://doi.org/10.1145/3098208.3098212
+Nitinder Mohan, Pengyuan Zhou, Keerthana Govindaraj, and Jussi Kangasharju. 2017. 
+Managing Data in Computational Edge Clouds. 
+In Proceedings of the Workshop on Mobile Edge Communications (MECOMM ’17). 
+Association for Computing Machinery, New York, NY, USA, 19–24. 
+DOI:https://doi.org/10.1145/3098208.3098212
 ```
 
